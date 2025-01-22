@@ -12,6 +12,7 @@ public class ChessPiece {
     private ChessGame.TeamColor pieceColor = null;
     private ChessPiece.PieceType type = null;
 
+
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
@@ -51,6 +52,12 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        if(board.getPiece(myPosition).getPieceType() == PieceType.KING) {
+            KingMovesCalculator kingMoves = new KingMovesCalculator();
+            return kingMoves.kingMoves(board, myPosition);
+        }
+        else {
+            return null;
+        }
     }
 }
