@@ -16,7 +16,7 @@ public class KingMovesCalculator {
             for(int j = -1; j < 2; j++) {
                 if(!(i == 0 && j == 0)) {
                     ChessPosition newPosition = new ChessPosition(myPosition.getRow() + i, myPosition.getColumn() + j);
-                    if((newPosition.getRow() >= 0 || newPosition.getRow() < 7) || (newPosition.getColumn() >= 0 || newPosition.getColumn() < 7)){
+                    if((newPosition.getRow() >= 1 && newPosition.getRow() < 9) && (newPosition.getColumn() >= 1 && newPosition.getColumn() < 9)){
                         if (board.getPiece(newPosition) == null) {
                             ChessMove move = new ChessMove(myPosition, newPosition, null);
                             validMoves.add(move);
