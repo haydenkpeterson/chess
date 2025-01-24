@@ -9,6 +9,7 @@ public class QueenMovesCalculator {
     public Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece queen_piece = board.getPiece(myPosition);
         boolean block = false;
+
         /*DIAGONAL MOVES */
         for(int i = 1; i < 9; i++) {
             if(block){

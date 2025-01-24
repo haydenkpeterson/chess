@@ -9,6 +9,8 @@ public class RookMovesCalculator {
     public Collection<ChessMove> rookMoves(ChessBoard board, ChessPosition myPosition) {
         ChessPiece rook_piece = board.getPiece(myPosition);
         boolean block = false;
+
+        /*VERTICAL MOVES*/
         for(int i = 1; i < 9; i++) {
             if(block){
                 block = false;
@@ -53,6 +55,8 @@ public class RookMovesCalculator {
                 }
             }
         }
+
+        /*LATERAL MOVES*/
         for(int j = 1; j < 9; j++) {
             if(block){
                 block = false;
