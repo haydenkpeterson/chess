@@ -18,6 +18,20 @@ public class ChessBoard {
 
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessBoard that = (ChessBoard) o;
+        return Objects.equals(position, that.position) && Objects.equals(chess, that.chess) && Objects.deepEquals(board, that.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(position, chess, Arrays.deepHashCode(board));
+    }
+
     /**
      * Adds a chess piece to the chessboard
      *

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class KingMovesCalculator {
-    Collection<ChessMove> validMoves = new ArrayList<>();
+    private Collection<ChessMove> validMoves = new ArrayList<>();
 
     /**
      * Function for King moves

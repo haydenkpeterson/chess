@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -16,6 +17,20 @@ public class ChessPiece {
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
     }
 
     /**
@@ -55,6 +70,26 @@ public class ChessPiece {
         if(board.getPiece(myPosition).getPieceType() == PieceType.KING) {
             KingMovesCalculator kingMoves = new KingMovesCalculator();
             return kingMoves.kingMoves(board, myPosition);
+        }
+        if(board.getPiece(myPosition).getPieceType() == PieceType.ROOK) {
+            RookMovesCalculator rookMoves = new RookMovesCalculator();
+            return rookMoves.rookMoves(board, myPosition);
+        }
+        if(board.getPiece(myPosition).getPieceType() == PieceType.BISHOP) {
+            BishopMovesCalculator bishopMoves = new BishopMovesCalculator();
+            return bishopMoves.bishopMoves(board, myPosition);
+        }
+        if(board.getPiece(myPosition).getPieceType() == PieceType.QUEEN) {
+            QueenMovesCalculator queenMoves = new QueenMovesCalculator();
+            return queenMoves.queenMoves(board, myPosition);
+        }
+        if(board.getPiece(myPosition).getPieceType() == PieceType.KNIGHT) {
+            KnightMovesCalculator knightMoves = new KnightMovesCalculator();
+            return knightMoves.knightMoves(board, myPosition);
+        }
+        if(board.getPiece(myPosition).getPieceType() == PieceType.PAWN) {
+            PawnMovesCalculator pawnMoves = new PawnMovesCalculator();
+            return pawnMoves.pawnMoves(board, myPosition);
         }
         else {
             return null;
