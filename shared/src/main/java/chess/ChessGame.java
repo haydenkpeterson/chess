@@ -9,7 +9,7 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessGame {
-    private TeamColor teamColor;
+    private TeamColor team;
     private ChessBoard board;
 
     public ChessGame() {
@@ -20,7 +20,7 @@ public class ChessGame {
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        return this.teamColor;
+        return this.team;
     }
 
     /**
@@ -29,7 +29,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        this.teamColor = team;
+        this.team = team;
     }
 
     /**
@@ -37,7 +37,11 @@ public class ChessGame {
      */
     public enum TeamColor {
         WHITE,
-        BLACK
+        BLACK;
+
+        public TeamColor opposite() {
+            return this == WHITE ? BLACK : WHITE;
+        }
     }
 
     /**
@@ -64,7 +68,42 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessBoard board = getBoard();
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        setTeamTurn(piece.getTeamColor());
+        try{
+            if(move.getPromotionPiece() != null) {
+                board.addPiece(move.getEndPosition(), piece);
+                replaceNull(board, move);
+            }
+            else{
+                ChessPiece promotionPiece = new ChessPiece(team, move.getPromotionPiece());
+                board.addPiece(move.getEndPosition(), promotionPiece);
+                replaceNull(board, move);
+                switchTurn(piece);
+            }
+        } catch (InvalidMoveException e) {
+            throw new InvalidMoveException("Invalid Move" + e);
+        }
+    }
+
+    /**
+     * switches team after move
+     * @param piece
+     */
+    public void switchTurn(ChessPiece piece){
+        setTeamTurn(piece.getTeamColor().opposite());
+    }
+
+
+    /**
+     * replaces the previous spot to null after a move
+     *
+     * @param board
+     * @param move
+     */
+    public void replaceNull(ChessBoard board, ChessMove move){
+        board.addPiece(move.getStartPosition(), null);
     }
 
     /**
