@@ -40,7 +40,12 @@ public class ChessGame {
         BLACK;
 
         public TeamColor opposite() {
-            return this == WHITE ? BLACK : WHITE;
+            if(this == WHITE){
+                return BLACK;
+            }
+            else{
+                return WHITE;
+            }
         }
     }
 
@@ -113,7 +118,29 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPosition kingPosition = null;
+        for(int i = 0; i < 8; i++){
+            for(int j = 0; j < 8; j++){
+                ChessPosition position = new ChessPosition(i, j);
+                if(board.getPiece(position).getPieceType() == ChessPiece.PieceType.KING && board.getPiece(position).getTeamColor() == teamColor){
+                    kingPosition = position;
+                }
+            }
+        }
+        for(int i = 0; i < 8; i++){
+            for(int j = 0; j < 8; j++){
+                ChessPosition position = new ChessPosition(i, j);
+                ChessPiece enemyPiece = board.getPiece(position);
+                if (enemyPiece.getTeamColor() == teamColor.opposite()) {
+                    for(ChessMove move : enemyPiece.pieceMoves(board, position)){
+                        if(move.getEndPosition() == kingPosition){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
