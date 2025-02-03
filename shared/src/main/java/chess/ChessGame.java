@@ -83,9 +83,10 @@ public class ChessGame {
                 throw new InvalidMoveException("Invalid move for " + piece.getPieceType());
             }
             setTeamTurn(piece.getTeamColor());
-            if (move.getPromotionPiece() != null) {
+            if (move.getPromotionPiece() == null) {
                 board.addPiece(move.getEndPosition(), piece);
                 replaceNull(board, move);
+                switchTurn(piece);
             } else {
                 ChessPiece promotionPiece = new ChessPiece(team, move.getPromotionPiece());
                 board.addPiece(move.getEndPosition(), promotionPiece);
