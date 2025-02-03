@@ -18,17 +18,6 @@ public class ChessBoard {
 
     }
 
-    public ChessBoard(ChessBoard other){
-        this.position = other.position;
-        this.chess = other.chess;
-        this.board = new ChessPiece[8][8];
-        for(int i = 0; i < 8; i++) {
-            for(int j = 0; j < 8; j++) {
-                this.board[i][j] = (other.board[i][j]);
-            }
-        }
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {

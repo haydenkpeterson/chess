@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -61,8 +62,20 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
+        Collection<ChessMove> moves;
+        Collection<ChessMove> movesToRemove = new ArrayList<>();
         if(piece != null) {
-            return piece.pieceMoves(getBoard(), startPosition);
+            moves = piece.pieceMoves(getBoard(), startPosition);
+            for(ChessMove move: moves){
+                ChessPiece takenPiece = board.getPiece(move.getEndPosition());
+                testMove(board, move);
+                if(isInCheck(piece.getTeamColor())){
+                    movesToRemove.add(move);
+                }
+                undoMove(board, move, piece, takenPiece);
+            }
+            moves.removeAll(movesToRemove);
+            return moves;
         }
         else{
             return null;
@@ -96,6 +109,30 @@ public class ChessGame {
         } catch (InvalidMoveException e) {
             System.out.println("Invalid move");
         }
+    }
+
+    /**
+     * tests move
+     * @param testBoard
+     * @param move
+     */
+    public void testMove(ChessBoard testBoard, ChessMove move) {
+        ChessPiece piece = testBoard.getPiece(move.getStartPosition());
+        if (move.getPromotionPiece() == null) {
+            testBoard.addPiece(move.getEndPosition(), piece);
+            replaceNull(testBoard, move);
+        }
+        else {
+            ChessPiece promotionPiece = new ChessPiece(team, move.getPromotionPiece());
+            testBoard.addPiece(move.getEndPosition(), promotionPiece);
+            replaceNull(testBoard, move);
+        }
+    }
+
+    public void undoMove(ChessBoard testBoard, ChessMove move, ChessPiece piece, ChessPiece takenPiece){
+
+        testBoard.addPiece(move.getStartPosition(), piece);
+        testBoard.addPiece(move.getEndPosition(), takenPiece);
     }
 
     /**
@@ -162,7 +199,6 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         if(isInCheck(teamColor)){
-            ChessBoard tempBoard = new ChessBoard(board);
             //simulate all team moves and check if king is still in check
             for(int i = 1; i < 9; i++){
                 for(int j = 1; j < 9; j++){
@@ -172,16 +208,15 @@ public class ChessGame {
                         if (piece.getTeamColor() == teamColor) {
                             Collection<ChessMove> possibleMoves = piece.pieceMoves(board, position);
                             for(ChessMove move : possibleMoves){
-                                try {
-                                    makeMove(move);
-                                } catch (InvalidMoveException e) {
-                                    throw new RuntimeException(e);
-                                }
+                                testMove(board, move);
                                 if(!isInCheck(teamColor)){
+                                    ChessPiece takenPiece = board.getPiece(move.getEndPosition());
+                                    undoMove(board, move, piece, takenPiece);
                                     return false;
                                 }
                                 else{
-                                    setBoard(tempBoard);
+                                    ChessPiece takenPiece = board.getPiece(move.getEndPosition());
+                                    undoMove(board, move, piece, takenPiece);
                                 }
                             }
                         }
