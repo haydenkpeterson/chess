@@ -92,7 +92,7 @@ public class ChessGame {
         try {
             ChessBoard board = getBoard();
             ChessPiece piece = board.getPiece(move.getStartPosition());
-            if (validMoves(move.getStartPosition()) == null) {
+            if (!validMoves(move.getStartPosition()).contains(move)) {
                 throw new InvalidMoveException("Invalid move for " + piece.getPieceType());
             }
             setTeamTurn(piece.getTeamColor());
