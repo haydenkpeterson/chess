@@ -14,7 +14,6 @@ public class MemoryGameDao implements GameDAO{
 
     @Override
     public void UpdateGame(GameData gameData) throws DataAccessException {
-
     }
 
     @Override
