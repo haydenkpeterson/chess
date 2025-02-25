@@ -1,11 +1,10 @@
 package dataaccess;
 
 import model.AuthData;
-import model.UserData;
 
 import java.util.ArrayList;
 
-public class MemoryAuthDao implements AuthDAO{
+public class MemoryAuthDAO implements AuthDAO{
     final private ArrayList<AuthData> authDataList = new ArrayList<>();
 
     @Override
@@ -26,5 +25,10 @@ public class MemoryAuthDao implements AuthDAO{
         else{
             return null;
         }
+    }
+
+    @Override
+    public void clearData() {
+        authDataList.clear();
     }
 }

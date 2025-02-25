@@ -4,16 +4,16 @@ import model.UserData;
 
 import java.util.ArrayList;
 
-public class MemoryUserDao implements UserDAO{
+public class MemoryUserDAO implements UserDAO{
     final private ArrayList<UserData> userDataList = new ArrayList<>();
 
     @Override
-    public void CreateUser(UserData userData) {
+    public void createUser(UserData userData) {
         userDataList.add(userData);
     }
 
     @Override
-    public UserData ReadUser(UserData userData) throws DataAccessException {
+    public UserData readUser(UserData userData) throws DataAccessException {
         if (userDataList.contains(userData)){
             return userData;
         }
@@ -23,7 +23,12 @@ public class MemoryUserDao implements UserDAO{
     }
 
     @Override
-    public void DeleteUser(UserData userData) throws DataAccessException {
+    public void deleteUser(UserData userData) throws DataAccessException {
         userDataList.remove(userData);
+    }
+
+    @Override
+    public void clearData() {
+        userDataList.clear();
     }
 }

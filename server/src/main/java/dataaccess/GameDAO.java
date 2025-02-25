@@ -3,8 +3,9 @@ package dataaccess;
 import model.GameData;
 
 public interface GameDAO {
-    void CreateGame(GameData gameData) throws DataAccessException;
-    void UpdateGame(GameData gameData) throws DataAccessException;
-    void DeleteGame(GameData gameData) throws DataAccessException;
-    GameData ReadGame(GameData gameData) throws DataAccessException;
+    void createGame(GameData gameData) throws DataAccessException;
+    void updateGame(GameData gameData) throws DataAccessException;
+    void deleteGame(GameData gameData) throws DataAccessException;
+    GameData readGame(GameData gameData) throws DataAccessException;
+    void clearData();
 }

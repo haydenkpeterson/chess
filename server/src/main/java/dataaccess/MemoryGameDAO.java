@@ -4,25 +4,25 @@ import model.GameData;
 
 import java.util.ArrayList;
 
-public class MemoryGameDao implements GameDAO{
+public class MemoryGameDAO implements GameDAO{
     final private ArrayList<GameData> gameDataList = new ArrayList<>();
 
     @Override
-    public void CreateGame(GameData gameData) throws DataAccessException {
+    public void createGame(GameData gameData) throws DataAccessException {
         gameDataList.add(gameData);
     }
 
     @Override
-    public void UpdateGame(GameData gameData) throws DataAccessException {
+    public void updateGame(GameData gameData) throws DataAccessException {
     }
 
     @Override
-    public void DeleteGame(GameData gameData) throws DataAccessException {
+    public void deleteGame(GameData gameData) throws DataAccessException {
         gameDataList.remove(gameData);
     }
 
     @Override
-    public GameData ReadGame(GameData gameData) throws DataAccessException {
+    public GameData readGame(GameData gameData) throws DataAccessException {
         if (gameDataList.contains(gameData)){
             return gameData;
         }
@@ -30,4 +30,10 @@ public class MemoryGameDao implements GameDAO{
             return null;
         }
     }
+
+    @Override
+    public void clearData() {
+        gameDataList.clear();
+    }
+
 }
