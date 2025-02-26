@@ -3,6 +3,7 @@ package dataaccess;
 import model.UserData;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class MemoryUserDAO implements UserDAO{
     final private ArrayList<UserData> userDataList = new ArrayList<>();
@@ -13,13 +14,13 @@ public class MemoryUserDAO implements UserDAO{
     }
 
     @Override
-    public UserData readUser(UserData userData) throws DataAccessException {
-        if (userDataList.contains(userData)){
-            return userData;
+    public UserData findUser(String username) throws DataAccessException {
+        for(UserData user: userDataList){
+            if (Objects.equals(user.username(), username)){
+                return user;
+            }
         }
-        else{
-            return null;
-        }
+        return null;
     }
 
     @Override
