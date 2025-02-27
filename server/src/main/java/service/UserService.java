@@ -17,8 +17,12 @@ public class UserService {
         this.authDao = authDao;
     }
 
-    public UserData getData(String username) throws DataAccessException {
+    public UserData getUser(String username) throws DataAccessException {
         return userDao.findUser(username);
+    }
+
+    public AuthData getAuth(String authToken) {
+        return authDao.findAuth(authToken);
     }
 
     public void createUser(UserData userData) throws DataAccessException {
