@@ -3,6 +3,7 @@ package dataaccess;
 import model.AuthData;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class MemoryAuthDAO implements AuthDAO{
     final private ArrayList<AuthData> authDataList = new ArrayList<>();
@@ -13,8 +14,8 @@ public class MemoryAuthDAO implements AuthDAO{
     }
 
     @Override
-    public void deleteAuth(AuthData authData) {
-        authDataList.remove(authData);
+    public void deleteAuth(String authToken) {
+        authDataList.removeIf(auth -> Objects.equals(auth.authToken(), authToken));
     }
 
     @Override
@@ -30,5 +31,10 @@ public class MemoryAuthDAO implements AuthDAO{
     @Override
     public void clearData() {
         authDataList.clear();
+    }
+
+    @Override
+    public ArrayList<AuthData> listAuths() {
+        return authDataList;
     }
 }

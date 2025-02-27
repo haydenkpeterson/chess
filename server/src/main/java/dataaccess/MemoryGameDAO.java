@@ -36,4 +36,8 @@ public class MemoryGameDAO implements GameDAO{
         gameDataList.clear();
     }
 
+    @Override
+    public ArrayList<GameData> listGames() {
+        return gameDataList;
+    }
 }

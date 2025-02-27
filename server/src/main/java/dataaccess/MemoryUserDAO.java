@@ -32,4 +32,9 @@ public class MemoryUserDAO implements UserDAO{
     public void clearData() {
         userDataList.clear();
     }
+
+    @Override
+    public ArrayList<UserData> listUsers() {
+        return userDataList;
+    }
 }

@@ -1,11 +1,9 @@
 package service;
 
-import model.AuthData;
-import model.GameData;
-import model.UserData;
 import dataaccess.UserDAO;
 import dataaccess.GameDAO;
 import dataaccess.AuthDAO;
+
 
 public class ClearService {
     private final UserDAO userDao;
@@ -22,6 +20,20 @@ public class ClearService {
         userDao.clearData();
         gameDao.clearData();
         authDao.clearData();
+    }
+
+    public boolean checkClear() {
+        boolean empty = true;
+        if(!userDao.listUsers().isEmpty()) {
+            empty = false;
+        }
+        if(!gameDao.listGames().isEmpty()) {
+            empty = false;
+        }
+        if(!authDao.listAuths().isEmpty()) {
+            empty = false;
+        }
+        return empty;
     }
 }
 
