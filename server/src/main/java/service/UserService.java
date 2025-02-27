@@ -7,6 +7,7 @@ import dataaccess.UserDAO;
 import dataaccess.AuthDAO;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class UserService {
     private final UserDAO userDao;
@@ -25,12 +26,15 @@ public class UserService {
         return authDao.findAuth(authToken);
     }
 
-    public void createUser(UserData userData) throws DataAccessException {
+    public AuthData createUser(UserData userData) throws DataAccessException {
         userDao.createUser(userData);
+        String token = generateToken();
+        return(createAuth(new AuthData(token, userData.username())));
     }
 
-    public void createAuth(AuthData authData) throws DataAccessException {
+    public AuthData createAuth(AuthData authData) throws DataAccessException {
         authDao.createAuth(authData);
+        return authData;
     }
 
     public boolean loginUser(String username, String password) throws DataAccessException {
@@ -41,6 +45,10 @@ public class UserService {
     public boolean logoutUser(String authToken){
         authDao.deleteAuth(authToken);
         return true;
+    }
+
+    public static String generateToken() {
+        return UUID.randomUUID().toString();
     }
 }
 
