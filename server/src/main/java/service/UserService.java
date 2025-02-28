@@ -37,9 +37,10 @@ public class UserService {
         return authData;
     }
 
-    public boolean loginUser(String username, String password) throws DataAccessException {
+    public AuthData loginUser(String username, String password) throws DataAccessException {
         UserData user = userDao.findUser(username);
-        return Objects.equals(user.password(), password);
+        String token = generateToken();
+        return(createAuth(new AuthData(token, user.username())));
     }
 
     public boolean logoutUser(String authToken){

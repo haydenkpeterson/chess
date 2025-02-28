@@ -21,6 +21,7 @@ public class Server {
 
         // Register your endpoints and handle exceptions here.
         Spark.post("/user", new UserHandler(userDAO, authDAO)::register);
+        Spark.post("/session", new UserHandler(userDAO, authDAO)::login);
         Spark.delete("/db", new ClearHandler(userDAO, authDAO, gameDAO)::clear);
 
         Spark.awaitInitialization();

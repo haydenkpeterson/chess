@@ -40,4 +40,23 @@ public class UserHandler {
             return response.body();
         }
     }
+
+    public String login(Request request, Response response) {
+        try {
+            UserData user = new Gson().fromJson(request.body(), UserData.class);
+            AuthData authData = userService.loginUser(user.username(), user.password());
+            response.status(200);
+            var res = new Gson().toJson(authData);
+            response.body(res);
+            return response.body();
+        } catch (DataAccessException e) {
+            response.status(401);
+            response.body("{\"message\": \"Error: unauthorized\"}");
+            return response.body();
+        } catch (Exception e) {
+            response.status(500);
+            response.body("{\"message\": \"Error: " + e.getMessage() + "\"}");
+            return response.body();
+        }
+    }
 }
