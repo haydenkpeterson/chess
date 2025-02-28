@@ -43,7 +43,7 @@ public class UserService {
         return(createAuth(new AuthData(token, user.username())));
     }
 
-    public boolean logoutUser(String authToken){
+    public boolean logoutUser(String authToken) throws DataAccessException{
         authDao.deleteAuth(authToken);
         return true;
     }

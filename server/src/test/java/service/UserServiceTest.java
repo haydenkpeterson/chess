@@ -8,8 +8,7 @@ import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTest {
     private final MemoryUserDAO userDAO = new MemoryUserDAO();
@@ -31,8 +30,8 @@ public class UserServiceTest {
 
     @Test
     void loginUser() throws DataAccessException {
-        service.createUser(new UserData("hp", "deeznuts", "pp@gmail.com"));
-        assertTrue(service.loginUser("hp", "deeznuts"));
+        AuthData authData = service.createUser(new UserData("hp", "deeznuts", "pp@gmail.com"));
+        assertNotNull(service.loginUser("hp", "deeznuts").authToken());
     }
     @Test
     void createAuth() throws DataAccessException {

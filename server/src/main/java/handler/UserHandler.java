@@ -59,4 +59,21 @@ public class UserHandler {
             return response.body();
         }
     }
+
+    public String logout(Request request, Response response) {
+        try {
+            String authToken = request.headers("Authorization");
+            userService.logoutUser(authToken);
+            response.status(200);
+            return "{}";
+        } catch (DataAccessException e) {
+            response.status(401);
+            response.body("{\"message\": \"Error: unauthorized\"}");
+            return response.body();
+        } catch (Exception e) {
+            response.status(500);
+            response.body("{\"message\": \"Error: " + e.getMessage() + "\"}");
+            return response.body();
+        }
+    }
 }

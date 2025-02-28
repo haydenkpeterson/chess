@@ -22,12 +22,10 @@ public class ClearHandler {
         try{
             clearService.clear();
             response.status(200);
-            System.out.println(response.body());
             return "{}";
         } catch (Exception e) {
             response.status(500);
             response.body("{\"message\": \"Error: " + e.getMessage() + "\"}");
-            System.out.println(response.body());
             return response.body();
         }
     }
