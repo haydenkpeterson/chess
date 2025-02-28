@@ -11,42 +11,33 @@ import spark.Request;
 import spark.Response;
 
 public class UserHandler {
-    private UserService userService;
-    private final UserDAO userDao;
-    private final AuthDAO authDao;
+    private final UserService userService;
 
     public UserHandler(UserDAO userDao, AuthDAO authDao) {
-
-        this.userDao = userDao;
-        this.authDao = authDao;
+        this.userService = new UserService(userDao, authDao);
     }
 
-    public Response register(Request request, Response result) throws DataAccessException {
-        String json = serializeRequest(request);
-        UserData userData = deserializeToUser(json);
-        AuthData authData = userService.createUser(userData);
-        String authJson = serialize(authData);
-        result = deserializeToResult(authJson);
-        return result;
-    }
-
-    private UserData deserializeToUser(String json) {
-        var serializer = new Gson();
-        return serializer.fromJson(json, UserData.class);
-    }
-
-    private String serialize(AuthData authData) {
-        var serializer = new Gson();
-        return serializer.toJson(authData);
-    }
-
-    private String serializeRequest(Request request) {
-        var serializer = new Gson();
-        return serializer.toJson(request);
-    }
-
-    private Response deserializeToResult(String json) {
-        var serializer = new Gson();
-        return serializer.fromJson(json, Response.class);
+    public String register(Request request, Response response) {
+        try {
+            UserData user = new Gson().fromJson(request.body(), UserData.class);
+            if (user.username().isEmpty() || user.password().isEmpty() || user.email().isEmpty()) {
+                response.status(400);
+                response.body("{\"message\": \"Error: bad request\"}");
+                return response.body();
+            }
+            AuthData authData = userService.createUser(user);
+            response.status(200);
+            var res = new Gson().toJson(authData);
+            response.body(res);
+            return response.body();
+        } catch (DataAccessException e) {
+            response.status(403);
+            response.body("{\"message\": \"Error: already taken\"}");
+            return response.body();
+        } catch (Exception e) {
+            response.status(500);
+            response.body("{\"message\": \"Error: " + e.getMessage() + "\"}");
+            return response.body();
+        }
     }
 }

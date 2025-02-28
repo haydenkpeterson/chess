@@ -17,7 +17,7 @@ public class ClearServiceTest {
     private final MemoryUserDAO userDAO = new MemoryUserDAO();
     private final MemoryGameDAO gameDAO = new MemoryGameDAO();
     private final MemoryAuthDAO authDAO = new MemoryAuthDAO();
-    static final ClearService service = new ClearService(new MemoryUserDAO(), new MemoryGameDAO(), new MemoryAuthDAO());
+    static final ClearService service = new ClearService(new MemoryUserDAO(), new MemoryAuthDAO(), new MemoryGameDAO());
 
     @BeforeEach
     void clear() {
