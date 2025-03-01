@@ -3,63 +3,55 @@ package service;
 import chess.ChessGame;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
-import model.AuthData;
 import model.GameData;
-import model.UserData;
 
 import java.util.HashSet;
 import java.util.Random;
-import dataaccess.UserDAO;
+
 import dataaccess.AuthDAO;
 
 import java.util.ArrayList;
 import java.util.Set;
 
 public class GameService {
-    private final UserDAO userDao;
-    private final AuthDAO authDao;
     private final GameDAO gameDAO;
     private static final Random random = new Random();
     private static final Set<Integer> setID = new HashSet<>();
 
 
-    public GameService(UserDAO userDao, AuthDAO authDao, GameDAO gameDAO) {
-        this.userDao = userDao;
-        this.authDao = authDao;
+    public GameService(GameDAO gameDAO) {
         this.gameDAO = gameDAO;
     }
 
-    public ArrayList<GameData> listGames(String authToken) throws DataAccessException {
-        AuthData authData = authDao.findAuth(authToken);
-        if(authData != null) {
-            return gameDAO.listGames();
+    public ArrayList<GameData> listGames() {
+        return gameDAO.listGames();
+    }
+
+    public int createGame(String gameName) throws DataAccessException {
+        if(gameName == null) {
+            throw new DataAccessException("Error: bad request");
+        }
+        if(getGame(gameName) != null) {
+            throw new DataAccessException("Error: bad request");
         }
         else {
-            throw new DataAccessException("Error: unauthorized");
+            int gameID = generateID();
+            GameData gameData = new GameData(gameID, null, null, gameName, new ChessGame());
+            gameDAO.createGame(gameData);
+            return gameID;
         }
     }
 
-    public int createGame(String authToken, String gameName) throws DataAccessException {
-        AuthData authData = authDao.findAuth(authToken);
-        if(authData == null) {
-            throw new DataAccessException("Error: unauthorized");
-        }
-        int gameID = generateID();
-        GameData gameData = new GameData(gameID, null, null, gameName, new ChessGame());
-        gameDAO.createGame(gameData);
-        return gameID;
+    public GameData getGame(String gameName){
+        return gameDAO.getGame(gameName);
     }
 
-    public boolean joinGame(String authToken, GameData gameData) throws DataAccessException {
-        AuthData authData = authDao.findAuth(authToken);
-        if(authData == null) {
-            throw new DataAccessException("Error: unauthorized");
-        }
+    public boolean joinGame(GameData gameData) throws DataAccessException {
         gameDAO.updateGame(gameData);
         return true;
     }
 
-    public int generateID() {
+    private int generateID() {
         int id;
         do{
             id = random.nextInt(10000);
