@@ -14,6 +14,17 @@ public class MemoryGameDAO implements GameDAO{
 
     @Override
     public void updateGame(GameData gameData) throws DataAccessException {
+        GameData game = findGame(gameData);
+        gameDataList.remove(game);
+        if(!gameData.whiteUsername().isEmpty() && game.whiteUsername().isEmpty()) {
+            gameDataList.add(new GameData(game.gameID(), gameData.whiteUsername(), game.blackUsername(), game.gameName(), game.game()));
+        }
+        else if(!gameData.blackUsername().isEmpty() && game.blackUsername().isEmpty()) {
+            gameDataList.add(new GameData(game.gameID(), game.whiteUsername(), gameData.blackUsername(), game.gameName(), game.game()));
+        }
+        else{
+            throw new DataAccessException("Error: already taken");
+        }
     }
 
     @Override
@@ -22,13 +33,13 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     @Override
-    public GameData readGame(GameData gameData) throws DataAccessException {
-        if (gameDataList.contains(gameData)){
-            return gameData;
+    public GameData findGame(GameData gameData) throws DataAccessException {
+        for(GameData game : gameDataList){
+            if(game.gameID() == gameData.gameID()){
+                return game;
+            }
         }
-        else{
-            return null;
-        }
+        return null;
     }
 
     @Override
