@@ -2,7 +2,6 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -182,13 +181,21 @@ public class ChessGame {
             for(int j = 1; j < 9; j++){
                 ChessPosition position = new ChessPosition(i, j);
                 ChessPiece enemyPiece = board.getPiece(position);
-                if(board.getPiece(position) != null) {
-                    if (enemyPiece.getTeamColor() == teamColor.opposite()) {
-                        for (ChessMove move : enemyPiece.pieceMoves(board, position)) {
-                            if (move.getEndPosition().getRow() == kingPosition.getRow() && move.getEndPosition().getColumn() == kingPosition.getColumn()) {
-                                return true;
-                            }
-                        }
+                if(isInCheckNull(position, enemyPiece, teamColor, kingPosition)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean isInCheckNull(ChessPosition position, ChessPiece enemyPiece, TeamColor teamColor, ChessPosition kingPosition){
+        if(board.getPiece(position) != null) {
+            if (enemyPiece.getTeamColor() == teamColor.opposite()) {
+                for (ChessMove move : enemyPiece.pieceMoves(board, position)) {
+                    if (move.getEndPosition().getRow() == kingPosition.getRow()
+                            && move.getEndPosition().getColumn() == kingPosition.getColumn()) {
+                        return true;
                     }
                 }
             }
@@ -208,22 +215,8 @@ public class ChessGame {
             for(int i = 1; i < 9; i++){
                 for(int j = 1; j < 9; j++){
                     ChessPosition position = new ChessPosition(i, j);
-                    if(board.getPiece(position) != null) {
-                        ChessPiece piece = board.getPiece(position);
-                        if (piece.getTeamColor() == teamColor) {
-                            Collection<ChessMove> possibleMoves = piece.pieceMoves(board, position);
-                            for(ChessMove move : possibleMoves){
-                                ChessPiece takenPiece = board.getPiece(move.getEndPosition());
-                                testMove(board, move);
-                                if(!isInCheck(teamColor)){
-                                    undoMove(board, move, piece, takenPiece);
-                                    return false;
-                                }
-                                else{
-                                    undoMove(board, move, piece, takenPiece);
-                                }
-                            }
-                        }
+                    if(!isInCheckmateNull(position, teamColor)){
+                        return false;
                     }
                 }
             }
@@ -232,6 +225,27 @@ public class ChessGame {
         else{
             return false;
         }
+    }
+
+    public boolean isInCheckmateNull(ChessPosition position, TeamColor teamColor) {
+        if(board.getPiece(position) != null) {
+            ChessPiece piece = board.getPiece(position);
+            if (piece.getTeamColor() == teamColor) {
+                Collection<ChessMove> possibleMoves = piece.pieceMoves(board, position);
+                for(ChessMove move : possibleMoves){
+                    ChessPiece takenPiece = board.getPiece(move.getEndPosition());
+                    testMove(board, move);
+                    if(!isInCheck(teamColor)){
+                        undoMove(board, move, piece, takenPiece);
+                        return false;
+                    }
+                    else{
+                        undoMove(board, move, piece, takenPiece);
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -246,13 +260,8 @@ public class ChessGame {
             for (int i = 1; i < 9; i++) {
                 for (int j = 1; j < 9; j++) {
                     ChessPosition position = new ChessPosition(i, j);
-                    if (board.getPiece(position) != null) {
-                        ChessPiece piece = board.getPiece(position);
-                        if (piece.getTeamColor() == teamColor) {
-                            if (!validMoves(position).isEmpty()) {
-                                return false;
-                            }
-                        }
+                    if(!isInStalemateNull(position, teamColor)){
+                        return false;
                     }
                 }
             }
@@ -261,6 +270,16 @@ public class ChessGame {
         else{
             return false;
         }
+    }
+
+    public boolean isInStalemateNull(ChessPosition position, TeamColor teamColor) {
+        if (board.getPiece(position) != null) {
+            ChessPiece piece = board.getPiece(position);
+            if (piece.getTeamColor() == teamColor) {
+                return validMoves(position).isEmpty();
+            }
+        }
+        return true;
     }
 
     /**
