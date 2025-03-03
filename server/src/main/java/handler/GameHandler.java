@@ -55,7 +55,7 @@ public class GameHandler {
         try {
             String authToken = request.headers("Authorization");
             JoinData joinData = new Gson().fromJson(request.body(), JoinData.class);
-            if(!Objects.equals(joinData.playerColor(), "WHITE") || !Objects.equals(joinData.playerColor(), "BLACK")) {
+            if(!Objects.equals(joinData.playerColor(), "WHITE") && !Objects.equals(joinData.playerColor(), "BLACK")) {
                 response.status(400);
                 response.body("{\"message\": \"Error: bad request\"}");
                 return response.body();
@@ -64,6 +64,16 @@ public class GameHandler {
             response.status(200);
             return "{}";
         } catch (DataAccessException e) {
+            if(Objects.equals(e.getMessage(), "Error: bad request")){
+                response.status(400);
+                response.body("{\"message\": \"Error: bad request\"}");
+                return response.body();
+            }
+            if(Objects.equals(e.getMessage(), "Error: already taken")){
+                response.status(403);
+                response.body("{\"message\": \"Error: already taken\"}");
+                return response.body();
+            }
             response.status(401);
             response.body("{\"message\": \"Error: unauthorized\"}");
             return response.body();

@@ -18,6 +18,9 @@ public class MemoryGameDAO implements GameDAO{
     @Override
     public void updateGame(AuthData authData, JoinData joinData) throws DataAccessException {
         GameData game = findGameFromId(joinData.gameID());
+        if(game == null){
+            throw new DataAccessException("Error: bad request");
+        }
         String user = authData.username();
         gameDataList.remove(game);
         if(Objects.equals(joinData.playerColor(), "WHITE") && game.whiteUsername() == null) {
