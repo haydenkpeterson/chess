@@ -7,7 +7,7 @@ public class QueenMovesCalculator {
     private Collection<ChessMove> validMoves = new ArrayList<>();
 
     public Collection<ChessMove> queenMoves(ChessBoard board, ChessPosition myPosition) {
-        ChessPiece queen_piece = board.getPiece(myPosition);
+        ChessPiece queenPiece = board.getPiece(myPosition);
         boolean block = false;
 
         /*DIAGONAL MOVES */
@@ -18,13 +18,13 @@ public class QueenMovesCalculator {
             }
             ChessPosition newPosition = new ChessPosition(myPosition.getRow() + i, myPosition.getColumn() + i);
             if((newPosition.getRow() >= 1 && newPosition.getRow() < 9) && (newPosition.getColumn() >= 1 && newPosition.getColumn() < 9)) {
-                if (board.getPiece(newPosition) == queen_piece){
+                if (board.getPiece(newPosition) == queenPiece){
                     continue;
                 }
                 if (board.getPiece(newPosition) == null) {
                     ChessMove move = new ChessMove(myPosition, newPosition, null);
                     validMoves.add(move);
-                } else if (board.getPiece(newPosition).getTeamColor() != queen_piece.getTeamColor()) {
+                } else if (board.getPiece(newPosition).getTeamColor() != queenPiece.getTeamColor()) {
                     ChessMove move = new ChessMove(myPosition, newPosition, null);
                     validMoves.add(move);
                     block = true;
@@ -40,13 +40,13 @@ public class QueenMovesCalculator {
             }
             ChessPosition newPosition = new ChessPosition(myPosition.getRow() - i, myPosition.getColumn() - i);
             if((newPosition.getRow() >= 1 && newPosition.getRow() < 9) && (newPosition.getColumn() >= 1 && newPosition.getColumn() < 9)) {
-                if (board.getPiece(newPosition) == queen_piece){
+                if (board.getPiece(newPosition) == queenPiece){
                     continue;
                 }
                 if (board.getPiece(newPosition) == null) {
                     ChessMove move = new ChessMove(myPosition, newPosition, null);
                     validMoves.add(move);
-                } else if (board.getPiece(newPosition).getTeamColor() != queen_piece.getTeamColor()) {
+                } else if (board.getPiece(newPosition).getTeamColor() != queenPiece.getTeamColor()) {
                     ChessMove move = new ChessMove(myPosition, newPosition, null);
                     validMoves.add(move);
                     block = true;
@@ -62,13 +62,13 @@ public class QueenMovesCalculator {
             }
             ChessPosition newPosition = new ChessPosition(myPosition.getRow() - j, myPosition.getColumn() + j);
             if((newPosition.getRow() >= 1 && newPosition.getRow() < 9) && (newPosition.getColumn() >= 1 && newPosition.getColumn() < 9)) {
-                if (board.getPiece(newPosition) == queen_piece){
+                if (board.getPiece(newPosition) == queenPiece){
                     continue;
                 }
                 if (board.getPiece(newPosition) == null) {
                     ChessMove move = new ChessMove(myPosition, newPosition, null);
                     validMoves.add(move);
-                } else if (board.getPiece(newPosition).getTeamColor() != queen_piece.getTeamColor()) {
+                } else if (board.getPiece(newPosition).getTeamColor() != queenPiece.getTeamColor()) {
                     ChessMove move = new ChessMove(myPosition, newPosition, null);
                     validMoves.add(move);
                     block = true;
@@ -84,13 +84,13 @@ public class QueenMovesCalculator {
             }
             ChessPosition newPosition = new ChessPosition(myPosition.getRow() + j, myPosition.getColumn() - j);
             if((newPosition.getRow() >= 1 && newPosition.getRow() < 9) && (newPosition.getColumn() >= 1 && newPosition.getColumn() < 9)) {
-                if (board.getPiece(newPosition) == queen_piece){
+                if (board.getPiece(newPosition) == queenPiece){
                     continue;
                 }
                 if (board.getPiece(newPosition) == null) {
                     ChessMove move = new ChessMove(myPosition, newPosition, null);
                     validMoves.add(move);
-                } else if (board.getPiece(newPosition).getTeamColor() != queen_piece.getTeamColor()) {
+                } else if (board.getPiece(newPosition).getTeamColor() != queenPiece.getTeamColor()) {
                     ChessMove move = new ChessMove(myPosition, newPosition, null);
                     validMoves.add(move);
                     block = true;
@@ -108,13 +108,13 @@ public class QueenMovesCalculator {
             }
             ChessPosition newPosition = new ChessPosition(myPosition.getRow() + i, myPosition.getColumn());
             if((newPosition.getRow() >= 1 && newPosition.getRow() < 9) && (newPosition.getColumn() >= 1 && newPosition.getColumn() < 9)) {
-                if (board.getPiece(newPosition) == queen_piece){
+                if (board.getPiece(newPosition) == queenPiece){
                     continue;
                 }
                 if (board.getPiece(newPosition) == null) {
                     ChessMove move = new ChessMove(myPosition, newPosition, null);
                     validMoves.add(move);
-                } else if (board.getPiece(newPosition).getTeamColor() != queen_piece.getTeamColor()) {
+                } else if (board.getPiece(newPosition).getTeamColor() != queenPiece.getTeamColor()) {
                     ChessMove move = new ChessMove(myPosition, newPosition, null);
                     validMoves.add(move);
                     block = true;
@@ -130,13 +130,13 @@ public class QueenMovesCalculator {
             }
             ChessPosition newPosition = new ChessPosition(myPosition.getRow() - i, myPosition.getColumn());
             if((newPosition.getRow() >= 1 && newPosition.getRow() < 9) && (newPosition.getColumn() >= 1 && newPosition.getColumn() < 9)) {
-                if (board.getPiece(newPosition) == queen_piece){
+                if (board.getPiece(newPosition) == queenPiece){
                     continue;
                 }
                 if (board.getPiece(newPosition) == null) {
                     ChessMove move = new ChessMove(myPosition, newPosition, null);
                     validMoves.add(move);
-                } else if (board.getPiece(newPosition).getTeamColor() != queen_piece.getTeamColor()) {
+                } else if (board.getPiece(newPosition).getTeamColor() != queenPiece.getTeamColor()) {
                     ChessMove move = new ChessMove(myPosition, newPosition, null);
                     validMoves.add(move);
                     block = true;
@@ -152,13 +152,13 @@ public class QueenMovesCalculator {
             }
             ChessPosition newPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn() + j);
             if((newPosition.getRow() >= 1 && newPosition.getRow() < 9) && (newPosition.getColumn() >= 1 && newPosition.getColumn() < 9)) {
-                if (board.getPiece(newPosition) == queen_piece){
+                if (board.getPiece(newPosition) == queenPiece){
                     continue;
                 }
                 if (board.getPiece(newPosition) == null) {
                     ChessMove move = new ChessMove(myPosition, newPosition, null);
                     validMoves.add(move);
-                } else if (board.getPiece(newPosition).getTeamColor() != queen_piece.getTeamColor()) {
+                } else if (board.getPiece(newPosition).getTeamColor() != queenPiece.getTeamColor()) {
                     ChessMove move = new ChessMove(myPosition, newPosition, null);
                     validMoves.add(move);
                     block = true;
@@ -174,13 +174,13 @@ public class QueenMovesCalculator {
             }
             ChessPosition newPosition = new ChessPosition(myPosition.getRow(), myPosition.getColumn() - j);
             if((newPosition.getRow() >= 1 && newPosition.getRow() < 9) && (newPosition.getColumn() >= 1 && newPosition.getColumn() < 9)) {
-                if (board.getPiece(newPosition) == queen_piece){
+                if (board.getPiece(newPosition) == queenPiece){
                     continue;
                 }
                 if (board.getPiece(newPosition) == null) {
                     ChessMove move = new ChessMove(myPosition, newPosition, null);
                     validMoves.add(move);
-                } else if (board.getPiece(newPosition).getTeamColor() != queen_piece.getTeamColor()) {
+                } else if (board.getPiece(newPosition).getTeamColor() != queenPiece.getTeamColor()) {
                     ChessMove move = new ChessMove(myPosition, newPosition, null);
                     validMoves.add(move);
                     block = true;

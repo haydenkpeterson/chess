@@ -17,11 +17,11 @@ public class ClearServiceTest {
     private final MemoryUserDAO userDAO = new MemoryUserDAO();
     private final MemoryGameDAO gameDAO = new MemoryGameDAO();
     private final MemoryAuthDAO authDAO = new MemoryAuthDAO();
-    static final ClearService service = new ClearService(new MemoryUserDAO(), new MemoryAuthDAO(), new MemoryGameDAO());
+    static final ClearService SERVICE = new ClearService(new MemoryUserDAO(), new MemoryAuthDAO(), new MemoryGameDAO());
 
     @BeforeEach
     void clear() {
-        service.clear();
+        SERVICE.clear();
     }
 
     @BeforeEach
@@ -35,7 +35,7 @@ public class ClearServiceTest {
 
     @Test
     void deleteAllData() {
-        service.clear();
-        assertTrue(service.checkClear());
+        SERVICE.clear();
+        assertTrue(SERVICE.checkClear());
     }
 }

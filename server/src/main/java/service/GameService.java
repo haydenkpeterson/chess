@@ -18,8 +18,8 @@ import java.util.Set;
 public class GameService {
     private final GameDAO gameDAO;
     private final AuthDAO authDao;
-    private static final Random random = new Random();
-    private static final Set<Integer> setID = new HashSet<>();
+    private static final Random RANDOM = new Random();
+    private static Set<Integer> setID = new HashSet<>();
 
 
     public GameService(AuthDAO authDao, GameDAO gameDAO) {
@@ -76,7 +76,7 @@ public class GameService {
     private int generateID() {
         int id;
         do{
-            id = random.nextInt(10000);
+            id = RANDOM.nextInt(10000);
         } while(setID.contains(id));
         setID.add(id);
         return id;

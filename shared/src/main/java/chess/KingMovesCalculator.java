@@ -11,7 +11,7 @@ public class KingMovesCalculator {
      */
 
     public Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition) {
-        ChessPiece king_piece = board.getPiece(myPosition);
+        ChessPiece kingPiece = board.getPiece(myPosition);
         for(int i = -1; i < 2; i++) {
             for(int j = -1; j < 2; j++) {
                 if(!(i == 0 && j == 0)) {
@@ -22,7 +22,7 @@ public class KingMovesCalculator {
                             validMoves.add(move);
                         }
                         else {
-                            if (board.getPiece(newPosition).getTeamColor() != king_piece.getTeamColor()) {
+                            if (board.getPiece(newPosition).getTeamColor() != kingPiece.getTeamColor()) {
                                 ChessMove move = new ChessMove(myPosition, newPosition, null);
                                 validMoves.add(move);
                             }
