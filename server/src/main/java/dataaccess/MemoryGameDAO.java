@@ -1,6 +1,8 @@
 package dataaccess;
 
+import model.AuthData;
 import model.GameData;
+import record.JoinData;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -14,14 +16,15 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     @Override
-    public void updateGame(GameData gameData) throws DataAccessException {
-        GameData game = findGameFromID(gameData);
+    public void updateGame(AuthData authData, JoinData joinData) throws DataAccessException {
+        GameData game = findGameFromId(joinData.gameID());
+        String user = authData.username();
         gameDataList.remove(game);
-        if(gameData.whiteUsername() != null && game.whiteUsername() == null) {
-            gameDataList.add(new GameData(game.gameID(), gameData.whiteUsername(), game.blackUsername(), game.gameName(), game.game()));
+        if(Objects.equals(joinData.playerColor(), "WHITE") && game.whiteUsername() == null) {
+            gameDataList.add(new GameData(game.gameID(), user, game.blackUsername(), game.gameName(), game.game()));
         }
-        else if(gameData.blackUsername() != null && game.blackUsername() == null) {
-            gameDataList.add(new GameData(game.gameID(), game.whiteUsername(), gameData.blackUsername(), game.gameName(), game.game()));
+        else if(Objects.equals(joinData.playerColor(), "BLACK") && game.blackUsername() == null) {
+            gameDataList.add(new GameData(game.gameID(), game.whiteUsername(), user, game.gameName(), game.game()));
         }
         else{
             throw new DataAccessException("Error: already taken");
@@ -34,9 +37,9 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     @Override
-    public GameData findGameFromID(GameData gameData) throws DataAccessException {
+    public GameData findGameFromId(int gameID) throws DataAccessException {
         for(GameData game : gameDataList){
-            if(game.gameID() == gameData.gameID()){
+            if(game.gameID() == gameID){
                 return game;
             }
         }

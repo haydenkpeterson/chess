@@ -20,7 +20,7 @@ public class UserHandler {
     public String register(Request request, Response response) {
         try {
             UserData user = new Gson().fromJson(request.body(), UserData.class);
-            if (user.username().isEmpty() || user.password().isEmpty() || user.email().isEmpty()) {
+            if (user.username() == null || user.password() == null || user.email() == null) {
                 response.status(400);
                 response.body("{\"message\": \"Error: bad request\"}");
                 return response.body();

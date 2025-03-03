@@ -3,6 +3,7 @@ package server;
 import dataaccess.*;
 import handler.UserHandler;
 import handler.ClearHandler;
+import handler.GameHandler;
 import spark.*;
 
 public class Server {
@@ -24,6 +25,9 @@ public class Server {
         Spark.post("/session", new UserHandler(userDAO, authDAO)::login);
         Spark.delete("/session", new UserHandler(userDAO, authDAO)::logout);
         Spark.delete("/db", new ClearHandler(userDAO, authDAO, gameDAO)::clear);
+        Spark.post("/game", new GameHandler(authDAO, gameDAO)::createGame);
+        Spark.get("/game", new GameHandler(authDAO, gameDAO)::listGames);
+        Spark.put("/game", new GameHandler(authDAO, gameDAO)::joinGame);
 
         Spark.awaitInitialization();
         return Spark.port();

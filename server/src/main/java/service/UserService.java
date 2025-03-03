@@ -38,7 +38,16 @@ public class UserService {
     }
 
     public AuthData loginUser(String username, String password) throws DataAccessException {
-        UserData user = userDao.findUser(username);
+        UserData user;
+        if(userDao.findUser(username) != null) {
+            user = userDao.findUser(username);
+        }
+        else{
+            throw new DataAccessException("Error: unauthorized");
+        }
+        if(!Objects.equals(password, user.password())){
+            throw new DataAccessException("Error: unauthorized");
+        }
         String token = generateToken();
         return(createAuth(new AuthData(token, user.username())));
     }
