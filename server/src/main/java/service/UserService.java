@@ -18,11 +18,11 @@ public class UserService {
         this.authDao = authDao;
     }
 
-    public UserData getUser(String username) throws DataAccessException {
+    protected UserData getUser(String username) throws DataAccessException {
         return userDao.findUser(username);
     }
 
-    public AuthData getAuth(String authToken) {
+    protected AuthData getAuth(String authToken) {
         return authDao.findAuth(authToken);
     }
 
@@ -32,7 +32,7 @@ public class UserService {
         return(createAuth(new AuthData(token, userData.username())));
     }
 
-    public AuthData createAuth(AuthData authData) {
+    protected AuthData createAuth(AuthData authData) {
         authDao.createAuth(authData);
         return authData;
     }
@@ -57,7 +57,7 @@ public class UserService {
         return true;
     }
 
-    public static String generateToken() {
+    private static String generateToken() {
         return UUID.randomUUID().toString();
     }
 }

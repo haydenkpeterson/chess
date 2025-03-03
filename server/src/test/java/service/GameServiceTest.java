@@ -9,6 +9,8 @@ import record.JoinData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameServiceTest {
@@ -66,5 +68,18 @@ public class GameServiceTest {
 
     @Test
     void listGames() throws DataAccessException {
+        AuthData auth = new AuthData("token", "hp");
+        service.createAuth(auth);
+        service.createGame("token", "game");
+        service.createGame("token", "game2");
+        assertNotNull(service.listGames(auth.authToken()));
+    }
+
+    @Test
+    void listGamesFail() throws DataAccessException {
+        AuthData auth = new AuthData("token", "hp");
+        service.createAuth(auth);
+        service.createGame("token", "game");
+        assertThrows(DataAccessException.class, () -> service.createGame("token2", "game2"), "Error: unauthorized");
     }
 }

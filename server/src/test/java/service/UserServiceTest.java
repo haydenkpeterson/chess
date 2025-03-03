@@ -29,10 +29,23 @@ public class UserServiceTest {
     }
 
     @Test
+    void createUserFail() throws DataAccessException {
+        service.createUser(new UserData("hpeterson", "deeznuts", "pp@gmail.com"));
+        assertThrows(DataAccessException.class, () -> service.createUser(new UserData("hpeterson", "deeznuts", "pp@gmail.com")), "Error: already taken");
+    }
+
+    @Test
     void loginUser() throws DataAccessException {
         AuthData authData = service.createUser(new UserData("hp", "deeznuts", "pp@gmail.com"));
         assertNotNull(service.loginUser("hp", "deeznuts").authToken());
     }
+
+    @Test
+    void loginUserFail() throws DataAccessException {
+        service.createUser(new UserData("hp", "deeznuts", "pp@gmail.com"));
+        assertThrows(DataAccessException.class, () -> service.loginUser("hp", "wrong password"), "Error: unauthorized");
+    }
+
     @Test
     void createAuth() throws DataAccessException {
         AuthData auth = new AuthData("token", "hp");
@@ -45,5 +58,12 @@ public class UserServiceTest {
         service.createUser(new UserData("hp", "deeznuts", "pp@gmail.com"));
         service.createAuth(new AuthData("token", "hp"));
         assertTrue(service.logoutUser("token"));
+    }
+
+    @Test
+    void logoutUserFail() throws DataAccessException {
+        service.createUser(new UserData("hp", "deeznuts", "pp@gmail.com"));
+        service.createAuth(new AuthData("token", "hp"));
+        assertThrows(DataAccessException.class, () -> service.logoutUser("42"), "Error: unauthorized");
     }
 }
