@@ -19,9 +19,11 @@ public class PawnMovesCalculator {
             checkTwo(myPosition, board);
 
             /*CHECK TAKE*/
-            checkTake(myPosition, board, pawnPiece);
+            ChessPosition newPosition = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() + 1);
+            checkTake(myPosition, newPosition, board, pawnPiece);
 
-            checkTake2(myPosition, board, pawnPiece);
+            newPosition = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() - 1);
+            checkTake(myPosition, newPosition, board, pawnPiece);
 
             /*CHECK PROMOTE*/
             checkPromote(myPosition, board, pawnPiece);
@@ -37,9 +39,11 @@ public class PawnMovesCalculator {
             checkTwoBlack(myPosition, board);
 
             /*CHECK TAKE*/
-            checkTakeBlack(myPosition, board, pawnPiece);
+            ChessPosition newPosition = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() - 1);
+            checkTakeBlack(myPosition, newPosition, board, pawnPiece);
 
-            checkTake2Black(myPosition, board, pawnPiece);
+            newPosition = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() + 1);
+            checkTakeBlack(myPosition, newPosition, board, pawnPiece);
 
             /*CHECK PROMOTE*/
             checkPromoteBlack(myPosition, board, pawnPiece);
@@ -75,21 +79,7 @@ public class PawnMovesCalculator {
         }
     }
 
-    public void checkTake(ChessPosition myPosition , ChessBoard board, ChessPiece pawnPiece) {
-        ChessPosition newPosition = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() + 1);
-        if ((newPosition.getRow() >= 1 && newPosition.getRow() < 9)
-                && (newPosition.getColumn() >= 1 && newPosition.getColumn() < 9)) {
-            if (myPosition.getRow() != 7) {
-                if ((board.getPiece(newPosition) != null) && (board.getPiece(newPosition).getTeamColor() != pawnPiece.getTeamColor())) {
-                    ChessMove move = new ChessMove(myPosition, newPosition, null);
-                    validMoves.add(move);
-                }
-            }
-        }
-    }
-
-    public void checkTake2(ChessPosition myPosition, ChessBoard board, ChessPiece pawnPiece) {
-        ChessPosition newPosition = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() - 1);
+    public void checkTake(ChessPosition myPosition, ChessPosition newPosition, ChessBoard board, ChessPiece pawnPiece) {
         if ((newPosition.getRow() >= 1 && newPosition.getRow() < 9)
                 && (newPosition.getColumn() >= 1 && newPosition.getColumn() < 9)) {
             if (myPosition.getRow() != 7) {
@@ -111,7 +101,8 @@ public class PawnMovesCalculator {
                 validMoves.add(new ChessMove(myPosition, newPosition, ChessPiece.PieceType.BISHOP));
             }
             if ((board.getPiece(new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() - 1)) != null)
-                    && board.getPiece(new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() - 1)).getTeamColor() != pawnPiece.getTeamColor()) {
+                    && board.getPiece(new ChessPosition(myPosition.getRow() + 1,
+                    myPosition.getColumn() - 1)).getTeamColor() != pawnPiece.getTeamColor()) {
                 validMoves.add(new ChessMove(myPosition, new ChessPosition(myPosition.getRow() + 1,
                         myPosition.getColumn() - 1), ChessPiece.PieceType.QUEEN));
                 validMoves.add(new ChessMove(myPosition, new ChessPosition(myPosition.getRow() + 1,
@@ -122,7 +113,8 @@ public class PawnMovesCalculator {
                         myPosition.getColumn() - 1), ChessPiece.PieceType.BISHOP));
             }
             if ((board.getPiece(new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() + 1)) != null)
-                    && (board.getPiece(new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() + 1)).getTeamColor() != pawnPiece.getTeamColor())) {
+                    && (board.getPiece(new ChessPosition(myPosition.getRow() + 1,
+                    myPosition.getColumn() + 1)).getTeamColor() != pawnPiece.getTeamColor())) {
                 validMoves.add(new ChessMove(myPosition, new ChessPosition(myPosition.getRow() + 1,
                         myPosition.getColumn() + 1), ChessPiece.PieceType.QUEEN));
                 validMoves.add(new ChessMove(myPosition, new ChessPosition(myPosition.getRow() + 1,
@@ -163,21 +155,7 @@ public class PawnMovesCalculator {
         }
     }
 
-    public void checkTakeBlack(ChessPosition myPosition, ChessBoard board, ChessPiece pawnPiece) {
-        ChessPosition newPosition = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() - 1);
-        if ((newPosition.getRow() >= 1 && newPosition.getRow() < 9)
-                && (newPosition.getColumn() >= 1 && newPosition.getColumn() < 9)) {
-            if (myPosition.getRow() != 2) {
-                if ((board.getPiece(newPosition) != null) && (board.getPiece(newPosition).getTeamColor() != pawnPiece.getTeamColor())) {
-                    ChessMove move = new ChessMove(myPosition, newPosition, null);
-                    validMoves.add(move);
-                }
-            }
-        }
-    }
-
-    public void checkTake2Black(ChessPosition myPosition, ChessBoard board, ChessPiece pawnPiece) {
-        ChessPosition newPosition = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() + 1);
+    public void checkTakeBlack(ChessPosition myPosition, ChessPosition newPosition, ChessBoard board, ChessPiece pawnPiece) {
         if ((newPosition.getRow() >= 1 && newPosition.getRow() < 9)
                 && (newPosition.getColumn() >= 1 && newPosition.getColumn() < 9)) {
             if (myPosition.getRow() != 2) {
@@ -203,7 +181,8 @@ public class PawnMovesCalculator {
                 validMoves.add(move);
             }
             if ((board.getPiece(new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() - 1)) != null)
-                    && (board.getPiece(new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() - 1)).getTeamColor() != pawnPiece.getTeamColor())) {
+                    && (board.getPiece(new ChessPosition(myPosition.getRow() - 1,
+                    myPosition.getColumn() - 1)).getTeamColor() != pawnPiece.getTeamColor())) {
                 validMoves.add(new ChessMove(myPosition, new ChessPosition(myPosition.getRow() - 1,
                         myPosition.getColumn() - 1), ChessPiece.PieceType.QUEEN));
                 validMoves.add(new ChessMove(myPosition, new ChessPosition(myPosition.getRow() - 1,
@@ -214,7 +193,8 @@ public class PawnMovesCalculator {
                         myPosition.getColumn() - 1), ChessPiece.PieceType.BISHOP));
             }
             if ((board.getPiece(new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() + 1)) != null)
-                    && (board.getPiece(new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() + 1)).getTeamColor() != pawnPiece.getTeamColor())) {
+                    && (board.getPiece(new ChessPosition(myPosition.getRow() - 1,
+                    myPosition.getColumn() + 1)).getTeamColor() != pawnPiece.getTeamColor())) {
                 validMoves.add(new ChessMove(myPosition, new ChessPosition(myPosition.getRow() - 1,
                         myPosition.getColumn() + 1), ChessPiece.PieceType.QUEEN));
                 validMoves.add(new ChessMove(myPosition, new ChessPosition(myPosition.getRow() - 1,
