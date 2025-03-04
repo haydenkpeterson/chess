@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.DataAccessException;
+import dataaccess.MemoryGameDAO;
 import dataaccess.MemoryUserDAO;
 import dataaccess.MemoryAuthDAO;
 import model.AuthData;
@@ -11,14 +12,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserServiceTest {
-    private final MemoryUserDAO userDAO = new MemoryUserDAO();
-    private final MemoryAuthDAO authDAO = new MemoryAuthDAO();
-    static final UserService SERVICE = new UserService(new MemoryUserDAO(), new MemoryAuthDAO());
+    private final MemoryUserDAO userDao = new MemoryUserDAO();
+    private final MemoryAuthDAO authDao = new MemoryAuthDAO();
+    private final UserService SERVICE = new UserService(userDao, authDao);
 
     @BeforeEach
     void clear() {
-        userDAO.clearData();
-        authDAO.clearData();
+        userDao.clearData();
+        authDao.clearData();
     }
 
     @Test
