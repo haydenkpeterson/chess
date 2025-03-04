@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class UserServiceTest {
     private final MemoryUserDAO userDao = new MemoryUserDAO();
     private final MemoryAuthDAO authDao = new MemoryAuthDAO();
-    private final UserService SERVICE = new UserService(userDao, authDao);
+    private final UserService service = new UserService(userDao, authDao);
 
     @BeforeEach
     void clear() {
@@ -24,47 +24,47 @@ public class UserServiceTest {
     @Test
     void createUser() throws DataAccessException {
         UserData user = new UserData("hp", "deeznuts", "pp@gmail.com");
-        SERVICE.createUser(new UserData("hp", "deeznuts", "pp@gmail.com"));
-        assertEquals(user, SERVICE.getUser("hp"));
+        service.createUser(new UserData("hp", "deeznuts", "pp@gmail.com"));
+        assertEquals(user, service.getUser("hp"));
     }
 
     @Test
     void createUserFail() throws DataAccessException {
-        SERVICE.createUser(new UserData("hpeterson", "deeznuts", "pp@gmail.com"));
+        service.createUser(new UserData("hpeterson", "deeznuts", "pp@gmail.com"));
         assertThrows(DataAccessException.class, () ->
-                SERVICE.createUser(new UserData("hpeterson", "deeznuts", "pp@gmail.com")), "Error: already taken");
+                service.createUser(new UserData("hpeterson", "deeznuts", "pp@gmail.com")), "Error: already taken");
     }
 
     @Test
     void loginUser() throws DataAccessException {
-        AuthData authData = SERVICE.createUser(new UserData("hp", "deeznuts", "pp@gmail.com"));
-        assertNotNull(SERVICE.loginUser("hp", "deeznuts").authToken());
+        AuthData authData = service.createUser(new UserData("hp", "deeznuts", "pp@gmail.com"));
+        assertNotNull(service.loginUser("hp", "deeznuts").authToken());
     }
 
     @Test
     void loginUserFail() throws DataAccessException {
-        SERVICE.createUser(new UserData("hp", "deeznuts", "pp@gmail.com"));
-        assertThrows(DataAccessException.class, () -> SERVICE.loginUser("hp", "wrong password"), "Error: unauthorized");
+        service.createUser(new UserData("hp", "deeznuts", "pp@gmail.com"));
+        assertThrows(DataAccessException.class, () -> service.loginUser("hp", "wrong password"), "Error: unauthorized");
     }
 
     @Test
     void createAuth() throws DataAccessException {
         AuthData auth = new AuthData("token", "hp");
-        SERVICE.createAuth(auth);
-        assertEquals(auth, SERVICE.getAuth("token"));
+        service.createAuth(auth);
+        assertEquals(auth, service.getAuth("token"));
     }
 
     @Test
     void logoutUser() throws DataAccessException {
-        SERVICE.createUser(new UserData("hp", "deeznuts", "pp@gmail.com"));
-        SERVICE.createAuth(new AuthData("token", "hp"));
-        assertTrue(SERVICE.logoutUser("token"));
+        service.createUser(new UserData("hp", "deeznuts", "pp@gmail.com"));
+        service.createAuth(new AuthData("token", "hp"));
+        assertTrue(service.logoutUser("token"));
     }
 
     @Test
     void logoutUserFail() throws DataAccessException {
-        SERVICE.createUser(new UserData("hp", "deeznuts", "pp@gmail.com"));
-        SERVICE.createAuth(new AuthData("token", "hp"));
-        assertThrows(DataAccessException.class, () -> SERVICE.logoutUser("42"), "Error: unauthorized");
+        service.createUser(new UserData("hp", "deeznuts", "pp@gmail.com"));
+        service.createAuth(new AuthData("token", "hp"));
+        assertThrows(DataAccessException.class, () -> service.logoutUser("42"), "Error: unauthorized");
     }
 }
