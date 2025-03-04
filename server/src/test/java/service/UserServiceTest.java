@@ -31,7 +31,8 @@ public class UserServiceTest {
     @Test
     void createUserFail() throws DataAccessException {
         SERVICE.createUser(new UserData("hpeterson", "deeznuts", "pp@gmail.com"));
-        assertThrows(DataAccessException.class, () -> SERVICE.createUser(new UserData("hpeterson", "deeznuts", "pp@gmail.com")), "Error: already taken");
+        assertThrows(DataAccessException.class, () ->
+                SERVICE.createUser(new UserData("hpeterson", "deeznuts", "pp@gmail.com")), "Error: already taken");
     }
 
     @Test
