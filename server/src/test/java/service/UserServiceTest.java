@@ -37,7 +37,7 @@ public class UserServiceTest {
 
     @Test
     void loginUser() throws DataAccessException {
-        AuthData authData = service.createUser(new UserData("hp", "deeznuts", "pp@gmail.com"));
+        service.createUser(new UserData("hp", "deeznuts", "pp@gmail.com"));
         assertNotNull(service.loginUser("hp", "deeznuts").authToken());
     }
 
