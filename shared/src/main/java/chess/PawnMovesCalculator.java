@@ -83,10 +83,7 @@ public class PawnMovesCalculator {
         if ((newPosition.getRow() >= 1 && newPosition.getRow() < 9)
                 && (newPosition.getColumn() >= 1 && newPosition.getColumn() < 9)) {
             if (myPosition.getRow() != 7) {
-                if ((board.getPiece(newPosition) != null) && (board.getPiece(newPosition).getTeamColor() != pawnPiece.getTeamColor())) {
-                    ChessMove move = new ChessMove(myPosition, newPosition, null);
-                    validMoves.add(move);
-                }
+                takeAdd(myPosition, newPosition, board, pawnPiece);
             }
         }
     }
@@ -159,10 +156,7 @@ public class PawnMovesCalculator {
         if ((newPosition.getRow() >= 1 && newPosition.getRow() < 9)
                 && (newPosition.getColumn() >= 1 && newPosition.getColumn() < 9)) {
             if (myPosition.getRow() != 2) {
-                if ((board.getPiece(newPosition) != null) && (board.getPiece(newPosition).getTeamColor() != pawnPiece.getTeamColor())) {
-                    ChessMove move = new ChessMove(myPosition, newPosition, null);
-                    validMoves.add(move);
-                }
+                takeAdd(myPosition, newPosition, board, pawnPiece);
             }
         }
     }
@@ -204,6 +198,13 @@ public class PawnMovesCalculator {
                 validMoves.add(new ChessMove(myPosition, new ChessPosition(myPosition.getRow() - 1,
                         myPosition.getColumn() + 1), ChessPiece.PieceType.BISHOP));
             }
+        }
+    }
+
+    public void takeAdd(ChessPosition myPosition, ChessPosition newPosition, ChessBoard board, ChessPiece pawnPiece) {
+        if ((board.getPiece(newPosition) != null) && (board.getPiece(newPosition).getTeamColor() != pawnPiece.getTeamColor())) {
+            ChessMove move = new ChessMove(myPosition, newPosition, null);
+            validMoves.add(move);
         }
     }
 }
