@@ -7,7 +7,7 @@ import handler.GameHandler;
 import spark.*;
 
 public class Server {
-    private final UserDAO userDAO = new MemoryUserDAO();
+    private final UserDAO userDAO = new SQLUserDao();
     private final AuthDAO authDAO = new MemoryAuthDAO();
     private final GameDAO gameDAO = new MemoryGameDAO();
 
