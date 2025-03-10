@@ -92,7 +92,7 @@ public class DatabaseManager {
               `gameName` varchar(256) NOT NULL,
               'game' varchar(256) NOT NULL,
               PRIMARY KEY (`gameID`),
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            )
             """
     };
 
