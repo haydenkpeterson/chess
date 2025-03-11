@@ -10,7 +10,7 @@ public class MemoryUserDAO implements UserDAO{
 
     @Override
     public void createUser(UserData userData) throws DataAccessException {
-        if(findUser(userData.username()) == null) {
+        if(findUser(userData.username(), userData.password()) == null) {
             userDataList.add(userData);
         }
         else{
@@ -19,7 +19,7 @@ public class MemoryUserDAO implements UserDAO{
     }
 
     @Override
-    public UserData findUser(String username) throws DataAccessException {
+    public UserData findUser(String username, String password) throws DataAccessException {
         for(UserData user: userDataList){
             if (Objects.equals(user.username(), username)){
                 return user;
