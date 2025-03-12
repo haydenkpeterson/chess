@@ -91,8 +91,8 @@ public class DatabaseManager {
             """
             CREATE TABLE IF NOT EXISTS game (
               `gameID` INT NOT NULL,
-                `whiteUsername` VARCHAR(256) NOT NULL,
-                `blackUsername` VARCHAR(256) NOT NULL,
+                `whiteUsername` VARCHAR(256) NULL,
+                `blackUsername` VARCHAR(256) NULL,
                 `gameName` VARCHAR(256) NOT NULL,
                 `game` MEDIUMTEXT NOT NULL,
                 PRIMARY KEY (`gameID`)

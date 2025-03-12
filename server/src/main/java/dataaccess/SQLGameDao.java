@@ -17,8 +17,8 @@ public class SQLGameDao implements GameDAO{
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, game) VALUES(?, ?, ?, ?, ?)")) {
                 preparedStatement.setInt(1, gameData.gameID());
-                preparedStatement.setString(2, "");
-                preparedStatement.setString(3, "");
+                preparedStatement.setString(2, null);
+                preparedStatement.setString(3, null);
                 preparedStatement.setString(4, gameData.gameName());
                 var game = new Gson().toJson(gameData.game());
                 preparedStatement.setString(5, game);
@@ -37,13 +37,13 @@ public class SQLGameDao implements GameDAO{
         }
         String user = authData.username();
         try (var conn = DatabaseManager.getConnection()) {
-            if (Objects.equals(joinData.playerColor(), "WHITE") && Objects.equals(game.whiteUsername(), "")) {
+            if (Objects.equals(joinData.playerColor(), "WHITE") && Objects.equals(game.whiteUsername(), null)) {
                 try (var preparedStatement = conn.prepareStatement("UPDATE game SET whiteUsername=? WHERE gameID=?")) {
                     preparedStatement.setString(1, user);
                     preparedStatement.setInt(2, game.gameID());
                     preparedStatement.executeUpdate();
                 }
-            } else if (Objects.equals(joinData.playerColor(), "BLACK") && Objects.equals(game.blackUsername(), "")) {
+            } else if (Objects.equals(joinData.playerColor(), "BLACK") && Objects.equals(game.blackUsername(), null)) {
                 try (var preparedStatement = conn.prepareStatement("UPDATE game SET blackUsername=? WHERE gameID=?")) {
                     preparedStatement.setString(1, user);
                     preparedStatement.setInt(2, game.gameID());
