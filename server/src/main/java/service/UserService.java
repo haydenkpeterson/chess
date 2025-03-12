@@ -9,6 +9,7 @@ import dataaccess.AuthDAO;
 import java.sql.SQLException;
 import java.util.Objects;
 import java.util.UUID;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class UserService {
     private final UserDAO userDao;
@@ -46,7 +47,7 @@ public class UserService {
         else{
             throw new DataAccessException("Error: unauthorized");
         }
-        if(!Objects.equals(password, user.password())){
+        if(!BCrypt.checkpw(password, user.password())){
             throw new DataAccessException("Error: unauthorized");
         }
         String token = generateToken();
