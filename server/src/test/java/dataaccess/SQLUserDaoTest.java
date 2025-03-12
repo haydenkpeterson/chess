@@ -27,7 +27,7 @@ public class SQLUserDaoTest {
     void createUserFail() throws DataAccessException, SQLException {
         UserData user = new UserData("hp", "deeznuts", "pp@gmail.com");
         sqlUserDao.createUser(user);
-        assertThrows(RuntimeException.class, () -> {
+        assertThrows(DataAccessException.class, () -> {
             sqlUserDao.createUser(user);
         });
     }
