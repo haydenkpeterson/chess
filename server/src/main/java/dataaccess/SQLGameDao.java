@@ -9,6 +9,7 @@ import record.JoinData;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class SQLGameDao implements GameDAO{
     @Override
@@ -29,13 +30,59 @@ public class SQLGameDao implements GameDAO{
     }
 
     @Override
-    public void updateGame(AuthData authData, JoinData joinData) throws DataAccessException {
-
+    public void updateGame(AuthData authData, JoinData joinData) throws DataAccessException, SQLException {
+        GameData game = findGameFromId(joinData.gameID());
+        if(game == null){
+            throw new DataAccessException("Error: bad request");
+        }
+        String user = authData.username();
+        try (var conn = DatabaseManager.getConnection()) {
+            if (Objects.equals(joinData.playerColor(), "WHITE") && Objects.equals(game.whiteUsername(), "")) {
+                try (var preparedStatement = conn.prepareStatement("UPDATE game SET whiteUsername=? WHERE gameID=?")) {
+                    preparedStatement.setString(1, user);
+                    preparedStatement.setInt(2, game.gameID());
+                    preparedStatement.executeUpdate();
+                }
+            } else if (Objects.equals(joinData.playerColor(), "BLACK") && Objects.equals(game.blackUsername(), "")) {
+                try (var preparedStatement = conn.prepareStatement("UPDATE game SET blackUsername=? WHERE gameID=?")) {
+                    preparedStatement.setString(1, user);
+                    preparedStatement.setInt(2, game.gameID());
+                    preparedStatement.executeUpdate();
+                }
+            } else {
+                throw new DataAccessException("Error: already taken");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public GameData findGameFromId(int gameID) throws DataAccessException {
-        return null;
+    public GameData findGameFromId(int gameID) throws DataAccessException, SQLException {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement(
+                    "SELECT * FROM game WHERE gameID = ?")) {
+                preparedStatement.setInt(1, gameID);
+                try (var rs = preparedStatement.executeQuery()) {
+                    if(rs.next()) {
+                        return new GameData(
+                                rs.getInt("gameID"),
+                                rs.getString("whiteUsername"),
+                                rs.getString("blackUsername"),
+                                rs.getString("gameName"),
+                                new Gson().fromJson((rs.getString("game")), ChessGame.class)
+                        );
+                    }
+                    else {
+                        return null;
+                    }
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override

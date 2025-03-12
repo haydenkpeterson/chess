@@ -9,8 +9,8 @@ import java.util.ArrayList;
 
 public interface GameDAO {
     void createGame(GameData gameData) throws DataAccessException, SQLException;
-    void updateGame(AuthData authData, JoinData joinData) throws DataAccessException;
-    GameData findGameFromId(int gameID) throws DataAccessException;
+    void updateGame(AuthData authData, JoinData joinData) throws DataAccessException, SQLException;
+    GameData findGameFromId(int gameID) throws DataAccessException, SQLException;
     GameData getGame(String gameName) throws DataAccessException, SQLException;
     void clearData();
     ArrayList<GameData> listGames();

@@ -84,6 +84,8 @@ public class GameHandler {
                 response.body("{\"message\": \"Error: unauthorized\"}");
                 return response.body();
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }
