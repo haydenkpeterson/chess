@@ -23,7 +23,7 @@ public class UserService {
         return userDao.findUser(username, null);
     }
 
-    protected AuthData getAuth(String authToken) {
+    protected AuthData getAuth(String authToken) throws SQLException, DataAccessException {
         return authDao.findAuth(authToken);
     }
 
@@ -33,12 +33,12 @@ public class UserService {
         return(createAuth(new AuthData(token, userData.username())));
     }
 
-    protected AuthData createAuth(AuthData authData) {
+    protected AuthData createAuth(AuthData authData) throws SQLException, DataAccessException {
         authDao.createAuth(authData);
         return authData;
     }
 
-    public AuthData loginUser(String username, String password) throws DataAccessException {
+    public AuthData loginUser(String username, String password) throws DataAccessException, SQLException {
         UserData user;
         if(userDao.findUser(username, password) != null) {
             user = userDao.findUser(username, password);
@@ -53,7 +53,7 @@ public class UserService {
         return(createAuth(new AuthData(token, user.username())));
     }
 
-    public boolean logoutUser(String authToken) throws DataAccessException{
+    public boolean logoutUser(String authToken) throws DataAccessException, SQLException {
         authDao.deleteAuth(authToken);
         return true;
     }

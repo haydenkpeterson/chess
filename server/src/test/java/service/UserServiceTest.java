@@ -50,7 +50,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void createAuth() throws DataAccessException {
+    void createAuth() throws DataAccessException, SQLException {
         AuthData auth = new AuthData("token", "hp");
         service.createAuth(auth);
         assertEquals(auth, service.getAuth("token"));

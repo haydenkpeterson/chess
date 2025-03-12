@@ -28,18 +28,18 @@ public class GameService {
         this.authDao = authDao;
     }
 
-    public ArrayList<GameData> listGames(String authToken) throws DataAccessException {
+    public ArrayList<GameData> listGames(String authToken) throws DataAccessException, SQLException {
         if(getAuth(authToken) == null){
             throw new DataAccessException("Error: unauthorized");
         }
         return gameDAO.listGames();
     }
 
-    protected AuthData getAuth(String authToken) {
+    protected AuthData getAuth(String authToken) throws SQLException, DataAccessException {
         return authDao.findAuth(authToken);
     }
 
-    protected void createAuth(AuthData authData) {
+    protected void createAuth(AuthData authData) throws SQLException, DataAccessException {
         authDao.createAuth(authData);
     }
 

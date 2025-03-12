@@ -8,6 +8,7 @@ import model.UserData;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class SQLAuthDao implements AuthDAO{
     @Override
@@ -25,9 +26,17 @@ public class SQLAuthDao implements AuthDAO{
     }
 
     @Override
-    public void deleteAuth(String authToken) throws DataAccessException {
-
-
+    public void deleteAuth(String authToken) throws DataAccessException, SQLException {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("DELETE FROM auth WHERE authToken = ?")) {
+                int deleteCheck = preparedStatement.executeUpdate();
+                if (deleteCheck == 0) {
+                    throw new DataAccessException("Error: unauthorized");
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
