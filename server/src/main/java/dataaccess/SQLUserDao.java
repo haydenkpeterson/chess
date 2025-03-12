@@ -1,6 +1,8 @@
 package dataaccess;
 
+import com.google.gson.Gson;
 import model.UserData;
+import org.eclipse.jetty.server.Authentication;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.ResultSet;
@@ -8,11 +10,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class SQLUserDao implements UserDAO{
-    private DatabaseManager manager;
 
     public SQLUserDao() {
         try {
-            this.manager.configureDatabase();
+            DatabaseManager manager = new DatabaseManager();
+            manager.configureDatabase();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -21,7 +23,7 @@ public class SQLUserDao implements UserDAO{
     @Override
     public void createUser(UserData userData) throws DataAccessException {
         var conn = DatabaseManager.getConnection();
-        try (var preparedStatement = conn.prepareStatement("INSERT INTO user (username, password, email) VALUES(?, ?)")) {
+        try (var preparedStatement = conn.prepareStatement("INSERT INTO user (username, password, email) VALUES(?, ?, ?)")) {
             preparedStatement.setString(1, userData.username());
             preparedStatement.setString(2, hashPassword(userData.password()));
             preparedStatement.setString(3, userData.email());
@@ -67,12 +69,35 @@ public class SQLUserDao implements UserDAO{
 
         @Override
     public void clearData() {
-
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("TRUNCATE tableNameHere")) {
+                preparedStatement.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public ArrayList<UserData> listUsers() {
-        return null;
+        var users = new ArrayList<UserData>();
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("SELECT username, password, email FROM user")) {
+                try (var rs = preparedStatement.executeQuery()) {
+                    while (rs.next()) {
+                        var name = rs.getString("username");
+                        var password = rs.getString("password");
+                        var email = rs.getString("email");
+                        users.add(new UserData(name, password, email));
+                    }
+                }
+            }
+        } catch (SQLException | DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        return users;
     }
 
     private String hashPassword(String password) {

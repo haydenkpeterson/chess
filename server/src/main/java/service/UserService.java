@@ -19,7 +19,7 @@ public class UserService {
     }
 
     protected UserData getUser(String username) throws DataAccessException {
-        return userDao.findUser(username, );
+        return userDao.findUser(username, null);
     }
 
     protected AuthData getAuth(String authToken) {
@@ -39,8 +39,8 @@ public class UserService {
 
     public AuthData loginUser(String username, String password) throws DataAccessException {
         UserData user;
-        if(userDao.findUser(username, ) != null) {
-            user = userDao.findUser(username, );
+        if(userDao.findUser(username, password) != null) {
+            user = userDao.findUser(username, password);
         }
         else{
             throw new DataAccessException("Error: unauthorized");

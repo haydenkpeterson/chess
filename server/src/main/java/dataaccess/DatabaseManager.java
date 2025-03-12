@@ -73,26 +73,30 @@ public class DatabaseManager {
     private final String[] createStatements = {
             """
             CREATE TABLE IF NOT EXISTS user (
-              `username` varchar(256) NOT NULL,
-              `password` varchar(256) NOT NULL,
-              `email` varchar(256) NOT NULL,
-              PRIMARY KEY (`username`),
-            )
-            
+              `username` VARCHAR(256) NOT NULL,
+              `password` VARCHAR(256) NOT NULL,
+              `email` VARCHAR(256) NOT NULL,
+              PRIMARY KEY (`username`)
+            );
+            """,
+
+            """
             CREATE TABLE IF NOT EXISTS auth (
-              `authToken` varchar(256) NOT NULL,
-              `username` varchar(256) NOT NULL,
-              PRIMARY KEY (`authToken`),
-            )
-            
-            CREATE TABLE IF NOT EXISTS user (
-              `gameID` int NOT NULL,
-              `whiteUsername` varchar(256) NOT NULL,
-              `blackUsername` varchar(256) NOT NULL,
-              `gameName` varchar(256) NOT NULL,
-              'game' varchar(256) NOT NULL,
-              PRIMARY KEY (`gameID`),
-            )
+              `authToken` VARCHAR(256) NOT NULL,
+              `username` VARCHAR(256) NOT NULL,
+              PRIMARY KEY (`authToken`)
+            );
+            """,
+
+            """
+            CREATE TABLE IF NOT EXISTS game (
+              `gameID` INT NOT NULL,
+                `whiteUsername` VARCHAR(256) NOT NULL,
+                `blackUsername` VARCHAR(256) NOT NULL,
+                `gameName` VARCHAR(256) NOT NULL,
+                `game` VARCHAR(256) NOT NULL,
+                PRIMARY KEY (`gameID`)
+            );
             """
     };
 
