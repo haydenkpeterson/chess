@@ -6,6 +6,7 @@ import dataaccess.GameDAO;
 import model.AuthData;
 import model.GameData;
 
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Random;
 
@@ -42,7 +43,7 @@ public class GameService {
         authDao.createAuth(authData);
     }
 
-    public GameData createGame(String authToken, String gameName) throws DataAccessException {
+    public GameData createGame(String authToken, String gameName) throws DataAccessException, SQLException {
         if(getAuth(authToken) == null){
             throw new DataAccessException("Error: unauthorized");
         }
@@ -60,7 +61,7 @@ public class GameService {
         }
     }
 
-    protected GameData getGame(String gameName){
+    protected GameData getGame(String gameName) throws SQLException, DataAccessException {
         return gameDAO.getGame(gameName);
     }
 

@@ -1,8 +1,6 @@
 package dataaccess;
 
-import com.google.gson.Gson;
 import model.UserData;
-import org.eclipse.jetty.server.Authentication;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.ResultSet;
@@ -21,16 +19,17 @@ public class SQLUserDao implements UserDAO{
     }
 
     @Override
-    public void createUser(UserData userData) throws DataAccessException {
-        var conn = DatabaseManager.getConnection();
-        try (var preparedStatement = conn.prepareStatement("INSERT INTO user (username, password, email) VALUES(?, ?, ?)")) {
-            preparedStatement.setString(1, userData.username());
-            preparedStatement.setString(2, hashPassword(userData.password()));
-            preparedStatement.setString(3, userData.email());
+    public void createUser(UserData userData) throws DataAccessException, SQLException {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var preparedStatement = conn.prepareStatement("INSERT INTO user (username, password, email) VALUES(?, ?, ?)")) {
+                preparedStatement.setString(1, userData.username());
+                preparedStatement.setString(2, hashPassword(userData.password()));
+                preparedStatement.setString(3, userData.email());
 
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+                preparedStatement.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -38,7 +37,8 @@ public class SQLUserDao implements UserDAO{
     public UserData findUser(String username, String password) throws DataAccessException {
         var conn = DatabaseManager.getConnection();
         try (var preparedStatement = conn.prepareStatement(
-                "SELECT username, password, email FROM users WHERE username = ?")) {
+                "SELECT username, password, email FROM user WHERE username = ?")) {
+            preparedStatement.setString(1, username);
             try (var result = preparedStatement.executeQuery()) {
                 return getUserData(result, username, password);
             } catch (SQLException e) {
@@ -67,10 +67,10 @@ public class SQLUserDao implements UserDAO{
         }
     }
 
-        @Override
+    @Override
     public void clearData() {
         try (var conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("TRUNCATE tableNameHere")) {
+            try (var preparedStatement = conn.prepareStatement("TRUNCATE user")) {
                 preparedStatement.executeUpdate();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -112,11 +112,11 @@ public class SQLUserDao implements UserDAO{
     private String readHashedPasswordFromDatabase(String username) throws DataAccessException, SQLException {
         var conn = DatabaseManager.getConnection();
         var password = "";
-        try (var preparedStatement = conn.prepareStatement("SELECT hashed_password FROM users WHERE username = ?")) {
+        try (var preparedStatement = conn.prepareStatement("SELECT password FROM user WHERE username = ?")) {
             preparedStatement.setString(1, username);
             try (var result = preparedStatement.executeQuery()) {
                 if (result.next()) {
-                    password = result.getString("hashed_password");
+                    password = result.getString("password");
                 }
             }
         }

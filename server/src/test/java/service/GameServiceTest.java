@@ -8,6 +8,8 @@ import model.GameData;
 import org.junit.jupiter.api.*;
 import record.JoinData;
 
+import java.sql.SQLException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -24,7 +26,7 @@ public class GameServiceTest {
 
     @Test
     @Order(1)
-    void getGame() throws DataAccessException{
+    void getGame() throws DataAccessException, SQLException {
         AuthData auth = new AuthData("token", "hp");
         service.createAuth(auth);
         service.createGame("token", "game5");
@@ -33,7 +35,7 @@ public class GameServiceTest {
 
     @Test
     @Order(2)
-    void createGameTest() throws DataAccessException {
+    void createGameTest() throws DataAccessException, SQLException {
         AuthData auth = new AuthData("token", "hp");
         service.createAuth(auth);
         service.createGame("token", "game");
@@ -49,7 +51,7 @@ public class GameServiceTest {
 
     @Test
     @Order(4)
-    void joinGameTest() throws DataAccessException {
+    void joinGameTest() throws DataAccessException, SQLException {
         AuthData auth = new AuthData("token", "hp");
         service.createAuth(auth);
         service.createGame("token", "game");
@@ -61,7 +63,7 @@ public class GameServiceTest {
 
     @Test
     @Order(5)
-    void joinGameFail() throws DataAccessException {
+    void joinGameFail() throws DataAccessException, SQLException {
         AuthData auth = new AuthData("token", "hp");
         service.createAuth(auth);
         service.createGame("token", "game");
@@ -72,7 +74,7 @@ public class GameServiceTest {
 
     @Test
     @Order(6)
-    void listGames() throws DataAccessException {
+    void listGames() throws DataAccessException, SQLException {
         AuthData auth = new AuthData("token", "hp");
         service.createAuth(auth);
         service.createGame("token", "game");
@@ -82,7 +84,7 @@ public class GameServiceTest {
 
     @Test
     @Order(7)
-    void listGamesFail() throws DataAccessException {
+    void listGamesFail() throws DataAccessException, SQLException {
         AuthData auth = new AuthData("token", "hp");
         service.createAuth(auth);
         service.createGame("token", "game");

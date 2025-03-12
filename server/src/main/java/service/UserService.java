@@ -6,6 +6,7 @@ import model.UserData;
 import dataaccess.UserDAO;
 import dataaccess.AuthDAO;
 
+import java.sql.SQLException;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -26,7 +27,7 @@ public class UserService {
         return authDao.findAuth(authToken);
     }
 
-    public AuthData createUser(UserData userData) throws DataAccessException {
+    public AuthData createUser(UserData userData) throws DataAccessException, SQLException {
         userDao.createUser(userData);
         String token = generateToken();
         return(createAuth(new AuthData(token, userData.username())));

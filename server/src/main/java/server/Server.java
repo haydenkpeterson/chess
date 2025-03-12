@@ -9,7 +9,7 @@ import spark.*;
 public class Server {
     private final UserDAO userDAO = new SQLUserDao();
     private final AuthDAO authDAO = new MemoryAuthDAO();
-    private final GameDAO gameDAO = new MemoryGameDAO();
+    private final GameDAO gameDAO = new SQLGameDao();
 
     public Server() {
 

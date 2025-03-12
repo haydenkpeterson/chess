@@ -12,6 +12,7 @@ import spark.Request;
 import spark.Response;
 import record.JoinData;
 
+import java.sql.SQLException;
 import java.util.Objects;
 
 public class GameHandler {
@@ -37,6 +38,8 @@ public class GameHandler {
             response.status(401);
             response.body("{\"message\": \"Error: unauthorized\"}");
             return response.body();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
