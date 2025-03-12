@@ -94,7 +94,7 @@ public class DatabaseManager {
                 `whiteUsername` VARCHAR(256) NOT NULL,
                 `blackUsername` VARCHAR(256) NOT NULL,
                 `gameName` VARCHAR(256) NOT NULL,
-                `game` VARCHAR(256) NOT NULL,
+                `game` MEDIUMTEXT NOT NULL,
                 PRIMARY KEY (`gameID`)
             );
             """

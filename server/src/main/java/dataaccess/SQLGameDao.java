@@ -16,11 +16,11 @@ public class SQLGameDao implements GameDAO{
         try (var conn = DatabaseManager.getConnection()) {
             try (var preparedStatement = conn.prepareStatement("INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, game) VALUES(?, ?, ?, ?, ?)")) {
                 preparedStatement.setInt(1, gameData.gameID());
-                preparedStatement.setString(2, gameData.whiteUsername());
-                preparedStatement.setString(3, gameData.blackUsername());
+                preparedStatement.setString(2, "");
+                preparedStatement.setString(3, "");
                 preparedStatement.setString(4, gameData.gameName());
                 var game = new Gson().toJson(gameData.game());
-                preparedStatement.setString(3, game);
+                preparedStatement.setString(5, game);
                 preparedStatement.executeUpdate();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
