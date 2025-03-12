@@ -56,8 +56,6 @@ public class SQLAuthDao implements AuthDAO{
                     else {
                         return null;
                     }
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);

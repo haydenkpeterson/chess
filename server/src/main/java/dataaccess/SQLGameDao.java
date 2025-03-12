@@ -7,6 +7,7 @@ import model.GameData;
 import model.UserData;
 import record.JoinData;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -15,7 +16,8 @@ public class SQLGameDao implements GameDAO{
     @Override
     public void createGame(GameData gameData) throws DataAccessException, SQLException {
         try (var conn = DatabaseManager.getConnection()) {
-            try (var preparedStatement = conn.prepareStatement("INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, game) VALUES(?, ?, ?, ?, ?)")) {
+            try (var preparedStatement = conn.prepareStatement(
+                    "INSERT INTO game (gameID, whiteUsername, blackUsername, gameName, game) VALUES(?, ?, ?, ?, ?)")) {
                 preparedStatement.setInt(1, gameData.gameID());
                 preparedStatement.setString(2, null);
                 preparedStatement.setString(3, null);
@@ -64,18 +66,7 @@ public class SQLGameDao implements GameDAO{
                     "SELECT * FROM game WHERE gameID = ?")) {
                 preparedStatement.setInt(1, gameID);
                 try (var rs = preparedStatement.executeQuery()) {
-                    if(rs.next()) {
-                        return new GameData(
-                                rs.getInt("gameID"),
-                                rs.getString("whiteUsername"),
-                                rs.getString("blackUsername"),
-                                rs.getString("gameName"),
-                                new Gson().fromJson((rs.getString("game")), ChessGame.class)
-                        );
-                    }
-                    else {
-                        return null;
-                    }
+                    return returnGameData(rs);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -92,24 +83,28 @@ public class SQLGameDao implements GameDAO{
                     "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM game WHERE gameName = ?")) {
                 preparedStatement.setString(1, gameName);
                 try (var rs = preparedStatement.executeQuery()) {
-                    if(rs.next()) {
-                        return new GameData(
-                                rs.getInt("gameID"),
-                                rs.getString("whiteUsername"),
-                                rs.getString("blackUsername"),
-                                rs.getString("gameName"),
-                                new Gson().fromJson((rs.getString("game")), ChessGame.class)
-                        );
-                    }
-                    else {
-                        return null;
-                    }
+                    return returnGameData(rs);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
+        }
+    }
+
+    private GameData returnGameData(ResultSet rs) throws SQLException {
+        if(rs.next()) {
+            return new GameData(
+                    rs.getInt("gameID"),
+                    rs.getString("whiteUsername"),
+                    rs.getString("blackUsername"),
+                    rs.getString("gameName"),
+                    new Gson().fromJson((rs.getString("game")), ChessGame.class)
+            );
+        }
+        else {
+            return null;
         }
     }
 

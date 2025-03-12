@@ -81,7 +81,8 @@ public class SQLGameDaoTest {
     void updateGameFail() throws SQLException, DataAccessException {
         sqlGameDao.createGame(new GameData(12, "hp", null, "game1", new ChessGame()));
         sqlGameDao.updateGame(new AuthData("token", "hp"), new JoinData("WHITE", 12));
-        assertEquals(new GameData(12, "hp", null, "game1", sqlGameDao.getGame("game1").game()).whiteUsername(), sqlGameDao.getGame("game1").whiteUsername());
+        assertEquals(new GameData(12, "hp", null, "game1",
+                sqlGameDao.getGame("game1").game()).whiteUsername(), sqlGameDao.getGame("game1").whiteUsername());
     }
 
     @Test
