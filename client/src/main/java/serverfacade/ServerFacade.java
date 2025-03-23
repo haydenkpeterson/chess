@@ -17,9 +17,9 @@ public class ServerFacade {
     }
 
 
-    public UserData register(UserData user) throws ResponseException {
+    public AuthData register(UserData user) throws ResponseException {
         var path = "/user";
-        return this.makeRequest("POST", path, user, UserData.class);
+        return this.makeRequest("POST", path, user, AuthData.class);
     }
 
     public AuthData login(UserData user) throws ResponseException {
