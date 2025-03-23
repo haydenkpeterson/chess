@@ -1,8 +1,6 @@
 package main.java.serverfacade;
 
 import com.google.gson.Gson;
-import exception.ErrorResponse;
-import exception.ResponseException;
 import model.GameData;
 import model.UserData;
 import model.AuthData;
