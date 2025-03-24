@@ -107,9 +107,34 @@ public class ServerFacadeTests {
         UserData user = new UserData("hp", "password", "email");
         facade.register(user);
         UserData login = new UserData("hp", "password", "");
-        AuthData auth = facade.login(login);
-        int id = facade.createGame(auth, new ServerFacade.Game("game"));
-        assertEquals(4,Integer.toString(id).length());
+        facade.login(login);
+        AuthData badAuth = new AuthData("badAuth", "hp");
+        assertThrows(ResponseException.class,
+                () -> facade.createGame(badAuth, new ServerFacade.Game("game")));
     }
+
+    @Test
+    public void listGames() throws ResponseException {
+        UserData user = new UserData("hp", "password", "email");
+        facade.register(user);
+        UserData login = new UserData("hp", "password", "");
+        AuthData auth = facade.login(login);
+        facade.createGame(auth, new ServerFacade.Game("game"));
+        facade.createGame(auth, new ServerFacade.Game("game2"));
+        assertEquals(2, facade.listGames(auth).length);
+    }
+
+    @Test
+    public void listGamesFail() throws ResponseException {
+        UserData user = new UserData("hp", "password", "email");
+        facade.register(user);
+        UserData login = new UserData("hp", "password", "");
+        AuthData auth = facade.login(login);
+        AuthData badAuth = new AuthData("badAuth", "hp");
+        assertThrows(ResponseException.class,
+                () -> facade.listGames(badAuth));
+    }
+
+
 }
 
