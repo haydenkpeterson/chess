@@ -143,17 +143,21 @@ public class Client {
     public String joinGame(String... params) {
         try {
             if(auth != null) {
-                int num = Integer.parseInt(params[0]);
-                String color = params[1];
-                for (Map.Entry<Integer, GameData> entry : gameMap.entrySet()) {
-                    if (entry.getKey() == num) {
-                        GameData game = entry.getValue();
-                        int gameID = game.gameID();
-                        server.updateGame(auth, new JoinData(color.toUpperCase(), gameID));
-                        return String.format("%s joined game %d as %s.", visitorName, num, color);
+                try {
+                    int num = Integer.parseInt(params[0]);
+                    String color = params[1];
+                    for (Map.Entry<Integer, GameData> entry : gameMap.entrySet()) {
+                        if (entry.getKey() == num) {
+                            GameData game = entry.getValue();
+                            int gameID = game.gameID();
+                            server.updateGame(auth, new JoinData(color.toUpperCase(), gameID));
+                            return String.format("%s joined game %d as %s.", visitorName, num, color);
+                        }
                     }
-                }
                 return "Game does not exist.";
+                } catch (NumberFormatException e) {
+                    return "Invalid game.";
+                }
             } else {
                 return "Unauthorized.";
             }
