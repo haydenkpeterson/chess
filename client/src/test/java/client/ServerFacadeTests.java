@@ -1,6 +1,7 @@
 package client;
 
 import exception.ResponseException;
+import model.GameData;
 import serverfacade.ServerFacade;
 import model.AuthData;
 import model.UserData;
@@ -80,6 +81,25 @@ public class ServerFacadeTests {
         facade.register(user);
         assertThrows(ResponseException.class,
                 () -> facade.logout(new AuthData("auth", "hp")));
+    }
+
+    @Test
+    public void clearTest() throws ResponseException {
+        UserData user = new UserData("hp", "password", "email");
+        facade.register(user);
+        UserData login = new UserData("hp", "password", "");
+        facade.login(login);
+        assertDoesNotThrow(() -> facade.clear());
+    }
+
+    @Test
+    public void createGame() throws ResponseException {
+        UserData user = new UserData("hp", "password", "email");
+        facade.register(user);
+        UserData login = new UserData("hp", "password", "");
+        AuthData auth = facade.login(login);
+        String response = facade.createGame(auth, new ServerFacade.Game("game"));
+        assertEquals(4, response.length());
     }
 }
 
