@@ -2,12 +2,17 @@ package client;
 
 import exception.ResponseException;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
+import record.JoinData;
 import serverfacade.ServerFacade;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Client {
+
     public enum State {
         SIGNEDOUT,
         SIGNEDIN
@@ -18,6 +23,7 @@ public class Client {
     private final String serverUrl;
     private State state = State.SIGNEDOUT;
     private AuthData auth;
+    private Map<Integer, GameData> gameMap = new HashMap<>();
 
     public Client(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -37,7 +43,7 @@ public class Client {
                 case "logout" -> logout();
                 case "join" -> joinGame(params);
                 case "create" -> create(params);
-                case "observe" -> observe(params);
+                case "observe" -> observe();
                 default -> help();
             };
         } catch (ResponseException ex) {
@@ -76,39 +82,85 @@ public class Client {
             }
         } catch (ResponseException e) {
             state = State.SIGNEDOUT;
-            return "Error logging in";
+            return "Error logging in.";
         }
     }
 
     public String logout() throws ResponseException {
-        assertSignedIn();
-        if(auth != null) {
-            server.logout(auth);
-            state = State.SIGNEDOUT;
-            auth = null;
-            return String.format("%s logged out", visitorName);
-        }
-        else {
-            return "unauthorized";
+        try {
+            assertSignedIn();
+            if (auth != null) {
+                server.logout(auth);
+                state = State.SIGNEDOUT;
+                auth = null;
+                return String.format("%s logged out.", visitorName);
+            } else {
+                return "Unauthorized.";
+            }
+        } catch (ResponseException e) {
+            return "Error.";
         }
     }
 
-    public String listGames(String... params) throws ResponseException {
+    public String create(String... params) {
         try {
-            if (params.length == 3) {
-                state = State.SIGNEDIN;
-                String username = params[0];
-                String password = params[1];
-                String email = params[2];
-                auth = server.register(new UserData(username, password, email));
-                return String.format("Registered as %s.", visitorName);
+            if(auth != null) {
+                String name = params[0];
+                server.createGame(auth, new ServerFacade.Game(name));
+                return String.format("Created game: %s.", name);
             } else {
-                return "Expected <USERNAME> <PASSWORD> <EMAIL>";
+                return "Unauthorized.";
             }
         } catch (ResponseException e) {
-            state = State.SIGNEDOUT;
-            return "Error registering";
+            return "Error.";
         }
+    }
+
+    public String listGames() throws ResponseException {
+        try {
+            if(auth != null) {
+                GameData[] games = server.listGames(auth);
+                int num = 0;
+                StringBuilder result = new StringBuilder();
+                for(GameData game : games) {
+                    gameMap.put(num, game);
+                    result.append(String.format("%d: white: %s, black: %s, game: %s\n",
+                            num, game.whiteUsername(), game.blackUsername(), game.gameName()));
+                    num++;
+                }
+                return result.toString();
+            } else {
+                return "Unauthorized.";
+            }
+        } catch (ResponseException e) {
+            return "Error.";
+        }
+    }
+
+    public String joinGame(String... params) {
+        try {
+            if(auth != null) {
+                int num = Integer.parseInt(params[0]);
+                String color = params[1];
+                for (Map.Entry<Integer, GameData> entry : gameMap.entrySet()) {
+                    if (entry.getKey() == num) {
+                        GameData game = entry.getValue();
+                        int gameID = game.gameID();
+                        server.updateGame(auth, new JoinData(color, gameID));
+                        return String.format("%s joined game %d as %s.", visitorName, num, color);
+                    }
+                }
+                return "Game does not exist.";
+            } else {
+                return "Unauthorized.";
+            }
+        } catch (ResponseException e) {
+            return "Error.";
+        }
+    }
+
+    public String observe() {
+        return "Not Implemented.";
     }
 
     public String help() {
