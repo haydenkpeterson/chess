@@ -5,19 +5,13 @@ import exception.ResponseException;
 import model.GameData;
 import model.UserData;
 import model.AuthData;
+import record.JoinData;
 
 import java.io.*;
 import java.net.*;
 
 public class ServerFacade {
     public record Game(String gameName){ }
-    public static class CreateGameResponse {
-        private int gameID;
-
-        public int getGameID() {
-            return gameID;
-        }
-    }
     private final String serverUrl;
 
     public ServerFacade(String url) {
@@ -54,8 +48,14 @@ public class ServerFacade {
 
     public int createGame(AuthData auth, Game game) throws ResponseException {
         var path = "/game";
-        CreateGameResponse response = this.makeRequest("POST", path, game, auth.authToken(), CreateGameResponse.class);
-        return response.getGameID();
+        record createGameResponse(int gameID) {}
+        var response = this.makeRequest("POST", path, game, auth.authToken(), createGameResponse.class);
+        return response.gameID();
+    }
+
+    public void updateGame(AuthData auth, JoinData join) throws ResponseException {
+        var path = "/game";
+        this.makeRequest("PUT", path, join, auth.authToken(), null);
     }
 
     private <T> T makeRequest(String method, String path, Object request, String header, Class<T> responseClass) throws ResponseException {

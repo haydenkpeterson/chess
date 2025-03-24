@@ -2,6 +2,7 @@ package client;
 
 import exception.ResponseException;
 import model.GameData;
+import record.JoinData;
 import serverfacade.ServerFacade;
 import model.AuthData;
 import model.UserData;
@@ -135,6 +136,25 @@ public class ServerFacadeTests {
                 () -> facade.listGames(badAuth));
     }
 
+    @Test
+    public void updateGame() throws ResponseException {
+        UserData user = new UserData("hp", "password", "email");
+        facade.register(user);
+        UserData login = new UserData("hp", "password", "");
+        AuthData auth = facade.login(login);
+        int id = facade.createGame(auth, new ServerFacade.Game("game"));
+        assertDoesNotThrow(() -> facade.updateGame(auth, new JoinData("WHITE", id)));
+    }
 
+    @Test
+    public void updateGameFail() throws ResponseException {
+        UserData user = new UserData("hp", "password", "email");
+        facade.register(user);
+        UserData login = new UserData("hp", "password", "");
+        AuthData auth = facade.login(login);
+        int id = facade.createGame(auth, new ServerFacade.Game("game"));
+        assertThrows(ResponseException.class,
+                () -> facade.updateGame(new AuthData("badAuth", "hp"), new JoinData("WHITE", id)));
+    }
 }
 
