@@ -10,7 +10,7 @@ import java.io.*;
 import java.net.*;
 
 public class ServerFacade {
-
+    public record Game(String gameName){ }
     private final String serverUrl;
 
     public ServerFacade(String url) {
@@ -44,9 +44,9 @@ public class ServerFacade {
         return response.game();
     }
 
-    public int createGame(AuthData auth) throws ResponseException {
+    public String createGame(AuthData auth, Game game) throws ResponseException {
         var path = "/game";
-        return this.makeRequest("POST", path, auth.authToken(), null, Integer.class);
+        return this.makeRequest("POST", path, game, auth.authToken(), String.class);
     }
 
     private <T> T makeRequest(String method, String path, Object request, String header, Class<T> responseClass) throws ResponseException {
