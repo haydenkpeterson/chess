@@ -3,6 +3,8 @@ package client;
 import java.util.Scanner;
 import ui.EscapeSequences;
 
+import static ui.EscapeSequences.*;
+
 public class Repl {
     private final Client client;
 
@@ -22,7 +24,7 @@ public class Repl {
 
             try {
                 result = client.eval(line);
-                System.out.print(BLUE + result);
+                System.out.print(SET_TEXT_COLOR_BLUE + result);
             } catch (Throwable e) {
                 var msg = e.toString();
                 System.out.print(msg);
@@ -32,7 +34,7 @@ public class Repl {
     }
 
     private void printPrompt() {
-        System.out.print("\n" + RESET + ">>> " + GREEN);
+        System.out.print("\n" + RESET_BG_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);
     }
 
 }

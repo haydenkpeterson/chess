@@ -56,6 +56,7 @@ public class Client {
             if (params.length == 3) {
                 state = State.SIGNEDIN;
                 String username = params[0];
+                System.out.println(username);
                 String password = params[1];
                 String email = params[2];
                 auth = server.register(new UserData(username, password, email));
