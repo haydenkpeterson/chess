@@ -2,6 +2,7 @@ import chess.*;
 
 import client.Repl;
 
+
 public class Main {
     public static void main(String[] args) {
         var piece = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
@@ -10,7 +11,7 @@ public class Main {
         if (args.length == 1) {
             serverUrl = args[0];
         }
-
         new Repl(serverUrl).run();
+
     }
 }
