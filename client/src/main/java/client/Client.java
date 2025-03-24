@@ -56,6 +56,7 @@ public class Client {
             if (params.length == 3) {
                 state = State.SIGNEDIN;
                 String username = params[0];
+                visitorName = username;
                 String password = params[1];
                 String email = params[2];
                 UserData user = new UserData(username, password, email);
@@ -75,6 +76,7 @@ public class Client {
             if (params.length == 2) {
                 state = State.SIGNEDIN;
                 String username = params[0];
+                visitorName = username;
                 String password = params[1];
                 auth = server.login(new UserData(username, password, ""));
                 return String.format("Logged in as %s.", visitorName);
@@ -121,7 +123,7 @@ public class Client {
         try {
             if(auth != null) {
                 GameData[] games = server.listGames(auth);
-                int num = 0;
+                int num = 1;
                 StringBuilder result = new StringBuilder();
                 for(GameData game : games) {
                     gameMap.put(num, game);
@@ -147,7 +149,7 @@ public class Client {
                     if (entry.getKey() == num) {
                         GameData game = entry.getValue();
                         int gameID = game.gameID();
-                        server.updateGame(auth, new JoinData(color, gameID));
+                        server.updateGame(auth, new JoinData(color.toUpperCase(), gameID));
                         return String.format("%s joined game %d as %s.", visitorName, num, color);
                     }
                 }
