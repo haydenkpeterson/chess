@@ -1,11 +1,12 @@
 package client;
 
-import main.java.serverfacade.ResponseException;
-import main.java.serverfacade.ServerFacade;
+import exception.ResponseException;
+import serverfacade.ServerFacade;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -18,7 +19,7 @@ public class ServerFacadeTests {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
-        facade = new ServerFacade(String.valueOf(port));
+        facade = new ServerFacade("http://localhost:" + String.valueOf(port));
     }
 
     @AfterAll
@@ -26,6 +27,8 @@ public class ServerFacadeTests {
         server.stop();
     }
 
+    @BeforeEach
+    void clear() throws ResponseException {facade.clear();}
 
     @Test
     public void register() throws ResponseException {
@@ -34,4 +37,49 @@ public class ServerFacadeTests {
         assertTrue(response.authToken().length() > 10);
         assertEquals("hp", response.username());
     }
+
+    @Test
+    public void registerFail() throws ResponseException {
+        UserData user = new UserData("hp", "password", "email");
+        facade.register(user);
+        assertThrows(ResponseException.class,
+                () -> facade.register(user));
+    }
+
+    @Test
+    public void login() throws ResponseException {
+        UserData user = new UserData("hp", "password", "email");
+        facade.register(user);
+        UserData login = new UserData("hp", "password", "");
+        AuthData response = facade.login(login);
+        assertTrue(response.authToken().length() > 10);
+        assertEquals("hp", response.username());
+    }
+
+    @Test
+    public void loginFail() throws ResponseException {
+        UserData user = new UserData("hp", "password", "email");
+        facade.register(user);
+        UserData login = new UserData("pp", "password", "");
+        assertThrows(ResponseException.class,
+                () -> facade.login(login));
+    }
+
+    @Test
+    public void logout() throws ResponseException {
+        UserData user = new UserData("hp", "password", "email");
+        facade.register(user);
+        UserData login = new UserData("hp", "password", "");
+        AuthData auth = facade.login(login);
+        assertDoesNotThrow(() -> facade.logout(auth));
+    }
+
+    @Test
+    public void logoutFail() throws ResponseException {
+        UserData user = new UserData("hp", "password", "email");
+        facade.register(user);
+        assertThrows(ResponseException.class,
+                () -> facade.logout(new AuthData("auth", "hp")));
+    }
 }
+

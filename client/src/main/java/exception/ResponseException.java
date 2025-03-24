@@ -1,4 +1,4 @@
-package main.java.serverfacade;
+package exception;
 
 import com.google.gson.Gson;
 
