@@ -33,7 +33,7 @@ public class GameHandler {
             GameData gameData = gameService.createGame(authToken, game.gameName);
             response.status(200);
             CreateData createData = new CreateData(gameData.gameID());
-            return (new Gson().toJson(createData));
+            return new Gson().toJson(createData);
         } catch (DataAccessException e) {
             response.status(401);
             response.body("{\"message\": \"Error: unauthorized\"}");

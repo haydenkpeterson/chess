@@ -98,8 +98,18 @@ public class ServerFacadeTests {
         facade.register(user);
         UserData login = new UserData("hp", "password", "");
         AuthData auth = facade.login(login);
-        String response = facade.createGame(auth, new ServerFacade.Game("game"));
-        assertEquals(4, response.length());
+        int id = facade.createGame(auth, new ServerFacade.Game("game"));
+        assertEquals(4,Integer.toString(id).length());
+    }
+
+    @Test
+    public void createGameFail() throws ResponseException {
+        UserData user = new UserData("hp", "password", "email");
+        facade.register(user);
+        UserData login = new UserData("hp", "password", "");
+        AuthData auth = facade.login(login);
+        int id = facade.createGame(auth, new ServerFacade.Game("game"));
+        assertEquals(4,Integer.toString(id).length());
     }
 }
 

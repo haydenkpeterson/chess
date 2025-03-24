@@ -11,6 +11,13 @@ import java.net.*;
 
 public class ServerFacade {
     public record Game(String gameName){ }
+    public static class CreateGameResponse {
+        private int gameID;
+
+        public int getGameID() {
+            return gameID;
+        }
+    }
     private final String serverUrl;
 
     public ServerFacade(String url) {
@@ -44,9 +51,10 @@ public class ServerFacade {
         return response.game();
     }
 
-    public String createGame(AuthData auth, Game game) throws ResponseException {
+    public int createGame(AuthData auth, Game game) throws ResponseException {
         var path = "/game";
-        return this.makeRequest("POST", path, game, auth.authToken(), String.class);
+        CreateGameResponse response = this.makeRequest("POST", path, game, auth.authToken(), CreateGameResponse.class);
+        return response.getGameID();
     }
 
     private <T> T makeRequest(String method, String path, Object request, String header, Class<T> responseClass) throws ResponseException {
