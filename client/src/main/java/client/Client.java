@@ -155,7 +155,8 @@ public class Client {
                             GameData game = entry.getValue();
                             int gameID = game.gameID();
                             server.updateGame(auth, new JoinData(color.toUpperCase(), gameID));
-                            return createBoard(color) + "/n" + String.format("%s joined game %d as %s.", visitorName, num, color);
+                            String board = createBoard(color.toUpperCase());
+                            return board + "/n" + String.format("%s joined game %d as %s.", visitorName, num, color);
                         }
                     }
                 return "Game does not exist.";
@@ -258,7 +259,7 @@ public class Client {
             return displayBoardWhite();
         }
         if(Objects.equals(color, "BLACK")) {
-            return displayBoardWhite();
+            return displayBoardBlack();
         }
         else{
             return "Invalid Color";
