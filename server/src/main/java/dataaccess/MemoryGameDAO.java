@@ -2,7 +2,7 @@ package dataaccess;
 
 import model.AuthData;
 import model.GameData;
-import record.JoinData;
+import model.JoinData;
 
 import java.util.ArrayList;
 import java.util.Objects;

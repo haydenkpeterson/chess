@@ -4,8 +4,7 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
-import model.UserData;
-import record.JoinData;
+import model.JoinData;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

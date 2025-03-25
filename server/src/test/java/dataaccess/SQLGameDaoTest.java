@@ -3,10 +3,9 @@ package dataaccess;
 import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
-import model.UserData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import record.JoinData;
+import model.JoinData;
 
 import java.sql.SQLException;
 

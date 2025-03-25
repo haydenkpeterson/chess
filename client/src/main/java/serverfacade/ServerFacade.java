@@ -5,7 +5,7 @@ import exception.ResponseException;
 import model.GameData;
 import model.UserData;
 import model.AuthData;
-import record.JoinData;
+import model.JoinData;
 
 import java.io.*;
 import java.net.*;

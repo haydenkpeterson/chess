@@ -10,7 +10,7 @@ import record.CreateData;
 import service.GameService;
 import spark.Request;
 import spark.Response;
-import record.JoinData;
+import model.JoinData;
 
 import java.sql.SQLException;
 import java.util.Objects;

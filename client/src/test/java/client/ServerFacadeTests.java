@@ -1,8 +1,7 @@
 package client;
 
 import exception.ResponseException;
-import model.GameData;
-import record.JoinData;
+import model.JoinData;
 import serverfacade.ServerFacade;
 import model.AuthData;
 import model.UserData;

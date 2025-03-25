@@ -6,7 +6,7 @@ import dataaccess.MemoryAuthDAO;
 import model.AuthData;
 import model.GameData;
 import org.junit.jupiter.api.*;
-import record.JoinData;
+import model.JoinData;
 
 import java.sql.SQLException;
 

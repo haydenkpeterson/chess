@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Random;
 
 import dataaccess.AuthDAO;
-import record.JoinData;
+import model.JoinData;
 
 import java.util.ArrayList;
 import java.util.Set;
