@@ -11,6 +11,7 @@ import ui.EscapeSequences;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static ui.EscapeSequences.*;
 
@@ -154,7 +155,7 @@ public class Client {
                             GameData game = entry.getValue();
                             int gameID = game.gameID();
                             server.updateGame(auth, new JoinData(color.toUpperCase(), gameID));
-                            return String.format("%s joined game %d as %s.", visitorName, num, color);
+                            return createBoard(color) + "/n" + String.format("%s joined game %d as %s.", visitorName, num, color);
                         }
                     }
                 return "Game does not exist.";
@@ -173,7 +174,7 @@ public class Client {
         return createBoard("WHITE");
     }
 
-    public String[][] boardArray() {
+    public String[][] boardArrayWhite() {
         return new String[][]{
                 {EscapeSequences.BLACK_ROOK, EscapeSequences.BLACK_KNIGHT, EscapeSequences.BLACK_BISHOP,
                         EscapeSequences.BLACK_QUEEN, EscapeSequences.BLACK_KING, EscapeSequences.BLACK_BISHOP,
@@ -198,13 +199,46 @@ public class Client {
         };
     }
 
-    private String createBoard(String color) {
-        return displayBoard();
+    public String[][] boardArrayBlack() {
+        return new String[][]{
+                {EscapeSequences.WHITE_ROOK, EscapeSequences.WHITE_KNIGHT, EscapeSequences.WHITE_BISHOP,
+                        EscapeSequences.WHITE_QUEEN, EscapeSequences.WHITE_KING, EscapeSequences.WHITE_BISHOP,
+                        EscapeSequences.WHITE_KNIGHT, EscapeSequences.WHITE_ROOK},
+                {EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN,
+                        EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN,
+                        EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN},
+                {EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY,
+                        EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY},
+                {EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY,
+                        EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY},
+                {EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY,
+                        EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY},
+                {EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY,
+                        EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY},
+                {EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN,
+                        EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN,
+                        EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN},
+                {EscapeSequences.BLACK_ROOK, EscapeSequences.BLACK_KNIGHT, EscapeSequences.BLACK_BISHOP,
+                        EscapeSequences.BLACK_QUEEN, EscapeSequences.BLACK_KING, EscapeSequences.BLACK_BISHOP,
+                        EscapeSequences.BLACK_KNIGHT, EscapeSequences.BLACK_ROOK}
+        };
     }
 
-    public String displayBoard() {
+    private String createBoard(String color) {
+        if(Objects.equals(color, "WHITE")) {
+            return displayBoardWhite();
+        }
+        if(Objects.equals(color, "BLACK")) {
+            return displayBoardWhite();
+        }
+        else{
+            return "Invalid Color";
+        }
+    }
+
+    public String displayBoardWhite() {
         StringBuilder boardDisplay = new StringBuilder();
-        String[][] board = boardArray();
+        String[][] board = boardArrayWhite();
 
         boardDisplay.append("   a   b   c  d   e   f  g   h\n");
 
