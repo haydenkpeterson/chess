@@ -46,7 +46,7 @@ public class Client {
                 case "logout" -> logout();
                 case "join" -> joinGame(params);
                 case "create" -> create(params);
-                case "observe" -> observe();
+                case "observe" -> observe(params);
                 default -> help();
             };
         } catch (ResponseException ex) {
@@ -174,14 +174,25 @@ public class Client {
         }
     }
 
-    public String observe() {
-        return createBoard("WHITE");
+    public String observe(String... params) {
+        try {
+            int num = Integer.parseInt(params[0]);
+            for (Map.Entry<Integer, GameData> entry : gameMap.entrySet()) {
+                if (entry.getKey() == num) {
+                    return createBoard("WHITE");
+                }
+            }
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+            return "Invalid game.";
+        }
+        return "Game does not exist.";
+
     }
 
     public String[][] boardArrayWhite() {
         return new String[][]{
             {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP,
-                    BLACK_QUEEN, BLACK_KING, BLACK_BISHOP,
+                    BLACK_KING, BLACK_QUEEN, BLACK_BISHOP,
                     BLACK_KNIGHT, BLACK_ROOK},
             {BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
                     BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
@@ -224,7 +235,7 @@ public class Client {
                     BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
                     BLACK_PAWN, BLACK_PAWN},
             {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP,
-                    BLACK_QUEEN, BLACK_KING, BLACK_BISHOP,
+                    BLACK_KING, BLACK_QUEEN, BLACK_BISHOP,
                     BLACK_KNIGHT, BLACK_ROOK}
         };
     }
