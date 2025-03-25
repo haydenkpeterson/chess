@@ -158,7 +158,7 @@ public class Client {
                         }
                     }
                 return "Game does not exist.";
-                } catch (NumberFormatException e) {
+                } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
                     return "Invalid game.";
                 }
             } else {
@@ -170,6 +170,7 @@ public class Client {
     }
 
     public String observe() {
+        return createBoard("WHITE");
     }
 
     public String[][] boardArray() {
@@ -195,6 +196,39 @@ public class Client {
                         EscapeSequences.WHITE_QUEEN, EscapeSequences.WHITE_KING, EscapeSequences.WHITE_BISHOP,
                         EscapeSequences.WHITE_KNIGHT, EscapeSequences.WHITE_ROOK}
         };
+    }
+
+    private String createBoard(String color) {
+        return displayBoard();
+    }
+
+    public String displayBoard() {
+        StringBuilder boardDisplay = new StringBuilder();
+        String[][] board = boardArray();
+
+        boardDisplay.append("   a   b   c  d   e   f  g   h\n");
+
+        for (int i = 0; i < board.length; i++) {
+            boardDisplay.append(8 - i).append(" ");
+
+            for (int j = 0; j < board[i].length; j++) {
+                boolean isLightSquare = (i + j) % 2 == 0;
+                String squareColor;
+                if (isLightSquare) {
+                    squareColor = SET_BG_COLOR_WHITE;
+                } else {
+                    squareColor = SET_BG_COLOR_DARK_GREY;
+                }
+
+                boardDisplay.append(squareColor)
+                        .append(board[i][j])
+                        .append(RESET_BG_COLOR);
+            }
+
+            boardDisplay.append(" ").append(8 - i).append("\n");
+        }
+        boardDisplay.append("   a   b   c  d   e   f  g   h\n");
+        return boardDisplay.toString();
     }
 
     public String help() {
