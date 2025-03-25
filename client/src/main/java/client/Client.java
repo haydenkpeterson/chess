@@ -230,6 +230,7 @@ public class Client {
         StringBuilder boardDisplay = new StringBuilder();
         String[][] board = boardArrayBlack();
 
+        boardDisplay.append(RESET_TEXT_COLOR);
         boardDisplay.append("   h   g   f  e   d   c  b   a\n");
 
         for (int i = 0; i < board.length; i++) {
@@ -239,14 +240,18 @@ public class Client {
                 boolean isLightSquare = (i + j) % 2 == 0;
                 String squareColor;
                 if (isLightSquare) {
-                    squareColor = SET_BG_COLOR_WHITE;
+                    squareColor = SET_BG_COLOR_LIGHT_GREY;
                 } else {
                     squareColor = SET_BG_COLOR_DARK_GREY;
                 }
 
+                String pieceColor = getPieceColor(board, i, j);
+
                 boardDisplay.append(squareColor)
+                        .append(pieceColor)
                         .append(board[i][j])
-                        .append(RESET_BG_COLOR);
+                        .append(RESET_BG_COLOR)
+                        .append(RESET_TEXT_COLOR);
             }
 
             boardDisplay.append(" ").append(1 + i).append("\n");
@@ -271,6 +276,7 @@ public class Client {
         StringBuilder boardDisplay = new StringBuilder();
         String[][] board = boardArrayWhite();
 
+        boardDisplay.append(RESET_TEXT_COLOR);
         boardDisplay.append("   a   b   c  d   e   f  g   h\n");
 
         for (int i = 0; i < board.length; i++) {
@@ -290,7 +296,8 @@ public class Client {
                 boardDisplay.append(squareColor)
                         .append(pieceColor)
                         .append(board[i][j])
-                        .append(RESET_BG_COLOR);
+                        .append(RESET_BG_COLOR)
+                        .append(RESET_TEXT_COLOR);
             }
 
             boardDisplay.append(" ").append(8 - i).append("\n");
