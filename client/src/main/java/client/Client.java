@@ -177,51 +177,52 @@ public class Client {
 
     public String[][] boardArrayWhite() {
         return new String[][]{
-                {EscapeSequences.BLACK_ROOK, EscapeSequences.BLACK_KNIGHT, EscapeSequences.BLACK_BISHOP,
-                        EscapeSequences.BLACK_QUEEN, EscapeSequences.BLACK_KING, EscapeSequences.BLACK_BISHOP,
-                        EscapeSequences.BLACK_KNIGHT, EscapeSequences.BLACK_ROOK},
-                {EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN,
-                        EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN,
-                        EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN},
-                {EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY,
-                        EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY},
-                {EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY,
-                        EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY},
-                {EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY,
-                        EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY},
-                {EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY,
-                        EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY},
-                {EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN,
-                        EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN,
-                        EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN},
-                {EscapeSequences.WHITE_ROOK, EscapeSequences.WHITE_KNIGHT, EscapeSequences.WHITE_BISHOP,
-                        EscapeSequences.WHITE_QUEEN, EscapeSequences.WHITE_KING, EscapeSequences.WHITE_BISHOP,
-                        EscapeSequences.WHITE_KNIGHT, EscapeSequences.WHITE_ROOK}
+            {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP,
+                    BLACK_QUEEN, BLACK_KING, BLACK_BISHOP,
+                    BLACK_KNIGHT, BLACK_ROOK},
+            {BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
+                    BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
+                    BLACK_PAWN, BLACK_PAWN},
+            {EMPTY, EMPTY, EMPTY, EMPTY,
+                    EMPTY, EMPTY, EMPTY, EMPTY},
+            {EMPTY, EMPTY, EMPTY, EMPTY,
+                    EMPTY, EMPTY, EMPTY, EMPTY},
+            {EMPTY, EMPTY, EMPTY, EMPTY,
+                    EMPTY, EMPTY, EMPTY, EMPTY},
+            {EMPTY, EMPTY, EMPTY, EMPTY,
+                    EMPTY, EMPTY, EMPTY, EMPTY},
+            {WHITE_PAWN, WHITE_PAWN, WHITE_PAWN,
+                    WHITE_PAWN, WHITE_PAWN, WHITE_PAWN,
+                    WHITE_PAWN, WHITE_PAWN},
+            {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP,
+                    WHITE_QUEEN, WHITE_KING, WHITE_BISHOP,
+                    WHITE_KNIGHT, WHITE_ROOK}
+
         };
     }
 
     public String[][] boardArrayBlack() {
         return new String[][]{
-                {EscapeSequences.WHITE_ROOK, EscapeSequences.WHITE_KNIGHT, EscapeSequences.WHITE_BISHOP,
-                        EscapeSequences.WHITE_QUEEN, EscapeSequences.WHITE_KING, EscapeSequences.WHITE_BISHOP,
-                        EscapeSequences.WHITE_KNIGHT, EscapeSequences.WHITE_ROOK},
-                {EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN,
-                        EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN,
-                        EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN},
-                {EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY,
-                        EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY},
-                {EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY,
-                        EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY},
-                {EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY,
-                        EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY},
-                {EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY,
-                        EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY},
-                {EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN,
-                        EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN,
-                        EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN},
-                {EscapeSequences.BLACK_ROOK, EscapeSequences.BLACK_KNIGHT, EscapeSequences.BLACK_BISHOP,
-                        EscapeSequences.BLACK_QUEEN, EscapeSequences.BLACK_KING, EscapeSequences.BLACK_BISHOP,
-                        EscapeSequences.BLACK_KNIGHT, EscapeSequences.BLACK_ROOK}
+            {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP,
+                    WHITE_QUEEN, WHITE_KING, WHITE_BISHOP,
+                    WHITE_KNIGHT, WHITE_ROOK},
+            {WHITE_PAWN, WHITE_PAWN, WHITE_PAWN,
+                    WHITE_PAWN, WHITE_PAWN, WHITE_PAWN,
+                    WHITE_PAWN, WHITE_PAWN},
+            {EMPTY, EMPTY, EMPTY, EMPTY,
+                    EMPTY, EMPTY, EMPTY, EMPTY},
+            {EMPTY, EMPTY, EMPTY, EMPTY,
+                    EMPTY, EMPTY, EMPTY, EMPTY},
+            {EMPTY, EMPTY, EMPTY, EMPTY,
+                    EMPTY, EMPTY, EMPTY, EMPTY},
+            {EMPTY, EMPTY, EMPTY, EMPTY,
+                    EMPTY, EMPTY, EMPTY, EMPTY},
+            {BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
+                    BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
+                    BLACK_PAWN, BLACK_PAWN},
+            {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP,
+                    BLACK_QUEEN, BLACK_KING, BLACK_BISHOP,
+                    BLACK_KNIGHT, BLACK_ROOK}
         };
     }
 
@@ -279,12 +280,15 @@ public class Client {
                 boolean isLightSquare = (i + j) % 2 == 0;
                 String squareColor;
                 if (isLightSquare) {
-                    squareColor = SET_BG_COLOR_WHITE;
+                    squareColor = SET_BG_COLOR_LIGHT_GREY;
                 } else {
                     squareColor = SET_BG_COLOR_DARK_GREY;
                 }
 
+                String pieceColor = getPieceColor(board, i, j);
+
                 boardDisplay.append(squareColor)
+                        .append(pieceColor)
                         .append(board[i][j])
                         .append(RESET_BG_COLOR);
             }
@@ -293,6 +297,28 @@ public class Client {
         }
         boardDisplay.append("   a   b   c  d   e   f  g   h\n");
         return boardDisplay.toString();
+    }
+
+    private static String getPieceColor(String[][] board, int i, int j) {
+        String pieceColor;
+        if (Objects.equals(board[i][j], WHITE_PAWN) ||
+                Objects.equals(board[i][j], WHITE_ROOK) ||
+                Objects.equals(board[i][j], WHITE_KNIGHT) ||
+                Objects.equals(board[i][j], WHITE_BISHOP) ||
+                Objects.equals(board[i][j], WHITE_QUEEN) ||
+                Objects.equals(board[i][j], WHITE_KING)) {
+            pieceColor = SET_TEXT_COLOR_BLUE;
+        } else if (Objects.equals(board[i][j], BLACK_PAWN) ||
+                Objects.equals(board[i][j], BLACK_ROOK) ||
+                Objects.equals(board[i][j], BLACK_KNIGHT) ||
+                Objects.equals(board[i][j], BLACK_BISHOP) ||
+                Objects.equals(board[i][j], BLACK_QUEEN) ||
+                Objects.equals(board[i][j], BLACK_KING)) {
+            pieceColor = SET_TEXT_COLOR_MAGENTA;
+        } else {
+            pieceColor = "";
+        }
+        return pieceColor;
     }
 
     public String help() {
