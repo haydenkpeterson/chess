@@ -143,6 +143,21 @@ public class Client {
         }
     }
 
+    public String makeJoin(String... params) throws ResponseException {
+        int num = Integer.parseInt(params[0]);
+        String color = params[1];
+        for (Map.Entry<Integer, GameData> entry : gameMap.entrySet()) {
+            if (entry.getKey() == num) {
+                GameData game = entry.getValue();
+                int gameID = game.gameID();
+                server.updateGame(auth, new JoinData(color.toUpperCase(), gameID));
+                String board = createBoard(color.toUpperCase());
+                return board + "/n" + String.format("%s joined game %d as %s.", visitorName, num, color);
+            }
+        }
+        return "Game does not exist.";
+    }
+
     public String joinGame(String... params) {
         try {
             if(auth != null) {
@@ -155,10 +170,10 @@ public class Client {
                             int gameID = game.gameID();
                             server.updateGame(auth, new JoinData(color.toUpperCase(), gameID));
                             String board = createBoard(color.toUpperCase());
-                            return board + "/n" + String.format("%s joined game %d as %s.", visitorName, num, color);
+                            return board + "\n" + String.format("%s joined game %d as %s.", visitorName, num, color);
                         }
                     }
-                return "Game does not exist.";
+                    return "Game does not exist.";
                 } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
                     return "Invalid game.";
                 }
@@ -225,6 +240,26 @@ public class Client {
         };
     }
 
+    public void addPieces(String[][] board, int i, StringBuilder boardDisplay) {
+        for (int j = 0; j < board[i].length; j++) {
+            boolean isLightSquare = (i + j) % 2 == 0;
+            String squareColor;
+            if (isLightSquare) {
+                squareColor = SET_BG_COLOR_LIGHT_GREY;
+            } else {
+                squareColor = SET_BG_COLOR_DARK_GREY;
+            }
+
+            String pieceColor = getPieceColor(board, i, j);
+
+            boardDisplay.append(squareColor)
+                    .append(pieceColor)
+                    .append(board[i][j])
+                    .append(RESET_BG_COLOR)
+                    .append(RESET_TEXT_COLOR);
+        }
+    }
+
     public String displayBoardBlack() {
         StringBuilder boardDisplay = new StringBuilder();
         String[][] board = boardArrayBlack();
@@ -234,25 +269,7 @@ public class Client {
 
         for (int i = 0; i < board.length; i++) {
             boardDisplay.append(1 + i).append(" ");
-
-            for (int j = 0; j < board[i].length; j++) {
-                boolean isLightSquare = (i + j) % 2 == 0;
-                String squareColor;
-                if (isLightSquare) {
-                    squareColor = SET_BG_COLOR_LIGHT_GREY;
-                } else {
-                    squareColor = SET_BG_COLOR_DARK_GREY;
-                }
-
-                String pieceColor = getPieceColor(board, i, j);
-
-                boardDisplay.append(squareColor)
-                        .append(pieceColor)
-                        .append(board[i][j])
-                        .append(RESET_BG_COLOR)
-                        .append(RESET_TEXT_COLOR);
-            }
-
+            addPieces(board, i , boardDisplay);
             boardDisplay.append(" ").append(1 + i).append("\n");
         }
         boardDisplay.append("   h   g   f  e   d   c  b   a\n");
@@ -280,25 +297,7 @@ public class Client {
 
         for (int i = 0; i < board.length; i++) {
             boardDisplay.append(8 - i).append(" ");
-
-            for (int j = 0; j < board[i].length; j++) {
-                boolean isLightSquare = (i + j) % 2 == 0;
-                String squareColor;
-                if (isLightSquare) {
-                    squareColor = SET_BG_COLOR_LIGHT_GREY;
-                } else {
-                    squareColor = SET_BG_COLOR_DARK_GREY;
-                }
-
-                String pieceColor = getPieceColor(board, i, j);
-
-                boardDisplay.append(squareColor)
-                        .append(pieceColor)
-                        .append(board[i][j])
-                        .append(RESET_BG_COLOR)
-                        .append(RESET_TEXT_COLOR);
-            }
-
+            addPieces(board, i, boardDisplay);
             boardDisplay.append(" ").append(8 - i).append("\n");
         }
         boardDisplay.append("   a   b   c  d   e   f  g   h\n");
