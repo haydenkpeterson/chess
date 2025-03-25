@@ -6,7 +6,6 @@ import model.GameData;
 import model.UserData;
 import record.JoinData;
 import serverfacade.ServerFacade;
-import ui.EscapeSequences;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -65,7 +64,7 @@ public class Client {
                 String email = params[2];
                 UserData user = new UserData(username, password, email);
                 auth = server.register(user);
-                return String.format("Registered as %s.", user.username());
+                return String.format("Registered as %s.", user.username()) + "\n" + help();
             } else {
                 return "Expected <USERNAME> <PASSWORD> <EMAIL>";
             }
@@ -83,7 +82,7 @@ public class Client {
                 visitorName = username;
                 String password = params[1];
                 auth = server.login(new UserData(username, password, ""));
-                return String.format("Logged in as %s.", visitorName);
+                return String.format("Logged in as %s.", visitorName) + "\n" + help();
             } else {
                 return "Expected <USERNAME> <PASSWORD>";
             }
