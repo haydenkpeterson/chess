@@ -152,7 +152,7 @@ public class Client {
                 int gameID = game.gameID();
                 server.updateGame(auth, new JoinData(color.toUpperCase(), gameID));
                 String board = createBoard(color.toUpperCase());
-                return board + "/n" + String.format("%s joined game %d as %s.", visitorName, num, color);
+                return board + "\n" + String.format("%s joined game %d as %s.", visitorName, num, color);
             }
         }
         return "Game does not exist.";
@@ -162,18 +162,7 @@ public class Client {
         try {
             if(auth != null) {
                 try {
-                    int num = Integer.parseInt(params[0]);
-                    String color = params[1];
-                    for (Map.Entry<Integer, GameData> entry : gameMap.entrySet()) {
-                        if (entry.getKey() == num) {
-                            GameData game = entry.getValue();
-                            int gameID = game.gameID();
-                            server.updateGame(auth, new JoinData(color.toUpperCase(), gameID));
-                            String board = createBoard(color.toUpperCase());
-                            return board + "\n" + String.format("%s joined game %d as %s.", visitorName, num, color);
-                        }
-                    }
-                    return "Game does not exist.";
+                    return makeJoin(params);
                 } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
                     return "Invalid game.";
                 }
