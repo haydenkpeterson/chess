@@ -6,6 +6,7 @@ import model.GameData;
 import model.UserData;
 import record.JoinData;
 import serverfacade.ServerFacade;
+import ui.EscapeSequences;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -166,8 +167,31 @@ public class Client {
         }
     }
 
-    public String observe() {
-        return "Not Implemented.";
+    public String[][] observe() {
+        private String[][] createInitialBoard() {
+            return new String[][] {
+                    {EscapeSequences.BLACK_ROOK, EscapeSequences.BLACK_KNIGHT, EscapeSequences.BLACK_BISHOP,
+                            EscapeSequences.BLACK_QUEEN, EscapeSequences.BLACK_KING, EscapeSequences.BLACK_BISHOP,
+                            EscapeSequences.BLACK_KNIGHT, EscapeSequences.BLACK_ROOK},
+                    {EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN,
+                            EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN,
+                            EscapeSequences.BLACK_PAWN, EscapeSequences.BLACK_PAWN},
+                    {EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY,
+                            EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY},
+                    {EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY,
+                            EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY},
+                    {EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY,
+                            EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY},
+                    {EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY,
+                            EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY, EscapeSequences.EMPTY},
+                    {EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN,
+                            EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN,
+                            EscapeSequences.WHITE_PAWN, EscapeSequences.WHITE_PAWN},
+                    {EscapeSequences.WHITE_ROOK, EscapeSequences.WHITE_KNIGHT, EscapeSequences.WHITE_BISHOP,
+                            EscapeSequences.WHITE_QUEEN, EscapeSequences.WHITE_KING, EscapeSequences.WHITE_BISHOP,
+                            EscapeSequences.WHITE_KNIGHT, EscapeSequences.WHITE_ROOK}
+            };
+        }
     }
 
     public String help() {
@@ -195,4 +219,6 @@ public class Client {
             throw new ResponseException(400, "You must sign in");
         }
     }
+
+
 }
