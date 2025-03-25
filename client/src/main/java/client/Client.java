@@ -224,6 +224,35 @@ public class Client {
         };
     }
 
+    public String displayBoardBlack() {
+        StringBuilder boardDisplay = new StringBuilder();
+        String[][] board = boardArrayBlack();
+
+        boardDisplay.append("   h   g   f  e   d   c  b   a\n");
+
+        for (int i = 0; i < board.length; i++) {
+            boardDisplay.append(1 + i).append(" ");
+
+            for (int j = 0; j < board[i].length; j++) {
+                boolean isLightSquare = (i + j) % 2 == 0;
+                String squareColor;
+                if (isLightSquare) {
+                    squareColor = SET_BG_COLOR_WHITE;
+                } else {
+                    squareColor = SET_BG_COLOR_DARK_GREY;
+                }
+
+                boardDisplay.append(squareColor)
+                        .append(board[i][j])
+                        .append(RESET_BG_COLOR);
+            }
+
+            boardDisplay.append(" ").append(1 + i).append("\n");
+        }
+        boardDisplay.append("   h   g   f  e   d   c  b   a\n");
+        return boardDisplay.toString();
+    }
+
     private String createBoard(String color) {
         if(Objects.equals(color, "WHITE")) {
             return displayBoardWhite();
