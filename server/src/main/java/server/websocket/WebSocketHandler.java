@@ -22,8 +22,10 @@ public class WebSocketHandler {
     public void onMessage(Session session, String message) throws IOException {
         Action action = new Gson().fromJson(message, Action.class);
         switch (action.type()) {
-            case ENTER -> enter(action.visitorName(), session);
-            case EXIT -> exit(action.visitorName());
+            case LEAVE -> enter(action.visitorName(), session);
+            case MAKE_MOVE -> exit(action.visitorName());
+            case RESIGN ->
+            case CONNECT ->
         }
     }
 
