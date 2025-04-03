@@ -6,11 +6,11 @@ import exception.ResponseException;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import websocket.messages.Notification;
+import websocket.messages.NotificationMessage;
 import websocket.commands.Action;
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
-import java.util.Timer;
 
 
 @WebSocket
@@ -22,31 +22,31 @@ public class WebSocketHandler {
     public void onMessage(Session session, String message) throws IOException {
         Action action = new Gson().fromJson(message, Action.class);
         switch (action.type()) {
-            case LEAVE -> enter(action.visitorName(), session);
-            case MAKE_MOVE -> exit(action.visitorName());
-            case RESIGN ->
-            case CONNECT ->
+            case LEAVE -> leave();
+            case MAKE_MOVE -> makeMove();
+            case RESIGN -> resign();
+            case CONNECT -> connect(, session);
         }
     }
 
-    private void enter(String visitorName, Session session) throws IOException {
+    private void connect(String visitorName, Session session) throws IOException {
         connections.add(visitorName, session);
         var message = String.format("%s is in the shop", visitorName);
-        var notification = new Notification(Notification.Type.ARRIVAL, message);
+        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
         connections.broadcast(visitorName, notification);
     }
 
     private void exit(String visitorName) throws IOException {
         connections.remove(visitorName);
         var message = String.format("%s left the shop", visitorName);
-        var notification = new Notification(Notification.Type.DEPARTURE, message);
+        var notification = new NotificationMessage(NotificationMessage.Type.DEPARTURE, message);
         connections.broadcast(visitorName, notification);
     }
 
     public void makeNoise(String petName, String sound) throws ResponseException {
         try {
             var message = String.format("%s says %s", petName, sound);
-            var notification = new Notification(Notification.Type.NOISE, message);
+            var notification = new NotificationMessage(NotificationMessage.Type.NOISE, message);
             connections.broadcast("", notification);
         } catch (Exception ex) {
             throw new ResponseException(500, ex.getMessage());
