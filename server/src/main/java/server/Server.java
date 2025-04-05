@@ -5,13 +5,14 @@ import handler.UserHandler;
 import handler.ClearHandler;
 import handler.GameHandler;
 import server.websocket.WebSocketHandler;
+import service.GameService;
 import spark.*;
 
 public class Server {
     private final UserDAO userDAO = new SQLUserDao();
     private final AuthDAO authDAO = new SQLAuthDao();
     private final GameDAO gameDAO = new SQLGameDao();
-    private final WebSocketHandler webSocketHandler = new WebSocketHandler();
+    private final WebSocketHandler webSocketHandler = new WebSocketHandler(new GameService(authDAO, gameDAO));
 
     public Server() {
 
