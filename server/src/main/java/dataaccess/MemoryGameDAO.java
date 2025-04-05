@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
 import model.JoinData;
@@ -32,6 +33,10 @@ public class MemoryGameDAO implements GameDAO{
         else{
             throw new DataAccessException("Error: already taken");
         }
+    }
+
+    @Override
+    public void makeMove(ChessGame game, int gameID) throws DataAccessException {
     }
 
     @Override
