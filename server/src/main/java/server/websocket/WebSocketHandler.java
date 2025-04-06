@@ -11,6 +11,7 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import service.GameService;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
@@ -28,7 +29,7 @@ public class WebSocketHandler {
     }
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws IOException, SQLException, DataAccessException {
+    public void onMessage(Session session, String message) throws IOException, SQLException, DataAccessException, InvalidMoveException {
         UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
         switch (command.getCommandType()) {
             case CONNECT -> connect(command.getAuthToken(), command.getGameID(), session);
@@ -40,7 +41,12 @@ public class WebSocketHandler {
     }
 
     private void connect(String token, int id, Session session) throws IOException, SQLException, DataAccessException {
-        String user = service.getUser(token);
+        String user;
+        try {
+            user = service.getUser(token);
+        } catch (SQLException) {
+            ErrorMessage errorMessage = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "ERROR: " + )
+        }
         connections.add(user, session);
         service.joinGame(token, new JoinData("WHITE", id));
         var message = String.format("%s connected as %s", user, "WHITE");
@@ -48,7 +54,9 @@ public class WebSocketHandler {
         connections.broadcast(user, notification);
     }
 
-    private void makeMove(String token, int id, ChessMove move, Session session) throws SQLException, DataAccessException, InvalidMoveException {
+    private void makeMove(String token, int id, ChessMove move, Session session) throws SQLException, DataAccessException, InvalidMoveException, IOException {
+        String user = service.getUser(token);
+        connections.add(user, session);
         service.makeMove(token, id, move);
         var message = String.format("%s connected as %s", user, "WHITE");
         var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
