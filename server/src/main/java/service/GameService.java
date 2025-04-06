@@ -67,6 +67,10 @@ public class GameService {
         return gameDAO.getGame(gameName);
     }
 
+    public GameData getGameFromID(int id) throws SQLException, DataAccessException {
+        return gameDAO.findGameFromId(id);
+    }
+
     public String getUser(String authToken) throws SQLException, DataAccessException {
         AuthData auth = authDao.findAuth(authToken);
         return auth.username();
