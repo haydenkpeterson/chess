@@ -52,19 +52,31 @@ public class WebSocketHandler {
             GameData game = service.getGameFromID(id);
             if(game == null) {
                 var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
+                connections.sendMsg(token, error);
             }
             else if (!game.game().isInStalemate(getTeamColor(user,game)) ||
                     game.game().isInCheckmate(getTeamColor(user,game))) {
                 var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "message");
+                connections.broadcast(token, notification);
             }
             else {
                 LoadGameMessage loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
-
+                connections.sendMsg(token, loadGame);
+                if(getTeamColor(user, game) == null) {
+                    var notification = new NotificationMessage(
+                            ServerMessage.ServerMessageType.NOTIFICATION, user + " connected to game as observer");
+                    connections.broadcast(token, notification);
+                }
+                else {
+                    var notification = new NotificationMessage(
+                            ServerMessage.ServerMessageType.NOTIFICATION,
+                            user + " connected to game as " + getTeamColor(user, game));
+                    connections.broadcast(token, notification);
+                }
             }
+        } catch (SQLException | DataAccessException | IOException e) {
+            throw new RuntimeException(e);
         }
-        var message = String.format("%s connected as %s", user, "WHITE");
-        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-        connections.broadcast(user, notification);
     }
 
     private ChessGame.TeamColor getTeamColor(String user, GameData game) {
@@ -74,11 +86,14 @@ public class WebSocketHandler {
         if(Objects.equals(user, game.blackUsername())){
             return ChessGame.TeamColor.BLACK;
         }
+        else{
+            return null;
+        }
     }
 
     private void makeMove(String token, int id, ChessMove move, Session session) throws SQLException, DataAccessException, InvalidMoveException, IOException {
         String user = service.getUser(token);
-        connections.add(user, session);
+        connections.add(token, session, id);
         service.makeMove(token, id, move);
         var message = String.format("%s connected as %s", user, "WHITE");
         var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
