@@ -41,6 +41,40 @@ public class WebSocketHandler {
                 MakeMoveCommand moveCommand = new Gson().fromJson(message, MakeMoveCommand.class);
             makeMove(moveCommand.getAuthToken(), moveCommand.getGameID(), moveCommand.move, session);
             }
+            case RESIGN -> resign(command.getAuthToken(), command.getGameID(), session);
+        }
+    }
+
+    private void resign(String token, Integer id, Session session) throws SQLException, DataAccessException, IOException {
+        if(service.verifyAuth(token) == null) {
+            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
+            connections.sendMsg(session, token, error);
+            return;
+        }
+        String user = service.getUser(token);
+        connections.add(token, session, id);
+        try {
+            GameData game = service.getGameFromID(id);
+            if(game == null) {
+                var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
+                connections.sendMsg(session, token, error);
+            }
+            else {
+                if(getTeamColor(user, game) == null) {
+                    var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
+                    connections.sendMsg(session, token, error);
+                }
+                else {
+                    game.game().setGameOver(true);
+                    service.resign(game, id);
+                    var notification = new NotificationMessage(
+                            ServerMessage.ServerMessageType.NOTIFICATION, user + " has resigned");
+                    connections.broadcast(token, notification);
+                    connections.sendMsg(session, token, notification);
+                }
+            }
+        } catch (SQLException | DataAccessException | IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

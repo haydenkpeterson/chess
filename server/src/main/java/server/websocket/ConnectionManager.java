@@ -72,6 +72,10 @@ public class ConnectionManager {
                 String msg = new Gson().toJson(errorMessage);
                 connection.send(msg);
             }
+            if (message instanceof NotificationMessage notificationMessage) {
+                String msg = new Gson().toJson(notificationMessage);
+                connection.send(msg);
+            }
         }
     }
 }

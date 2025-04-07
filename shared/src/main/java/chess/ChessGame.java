@@ -12,11 +12,13 @@ import java.util.Collection;
 public class ChessGame {
     private TeamColor team;
     private ChessBoard board;
+    private Boolean gameOver;
 
     public ChessGame() {
         setBoard(new ChessBoard());
         this.board.resetBoard();
         this.team = TeamColor.WHITE;
+        this.gameOver = false;
     }
 
     /**
@@ -89,26 +91,28 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         try {
-            ChessBoard board = getBoard();
-            if(board.getPiece(move.getStartPosition()) == null){
-                throw new InvalidMoveException();
-            }
-            ChessPiece piece = board.getPiece(move.getStartPosition());
-            if(piece.getTeamColor() != team){
-                throw new InvalidMoveException();
-            }
-            if (!validMoves(move.getStartPosition()).contains(move)) {
-                throw new InvalidMoveException("Invalid move for " + piece.getPieceType());
-            }
-            if (move.getPromotionPiece() == null) {
-                board.addPiece(move.getEndPosition(), piece);
-                replaceNull(board, move);
-                switchTurn(piece);
-            } else {
-                ChessPiece promotionPiece = new ChessPiece(team, move.getPromotionPiece());
-                board.addPiece(move.getEndPosition(), promotionPiece);
-                replaceNull(board, move);
-                switchTurn(piece);
+            if(!gameOver) {
+                ChessBoard board = getBoard();
+                if (board.getPiece(move.getStartPosition()) == null) {
+                    throw new InvalidMoveException();
+                }
+                ChessPiece piece = board.getPiece(move.getStartPosition());
+                if (piece.getTeamColor() != team) {
+                    throw new InvalidMoveException();
+                }
+                if (!validMoves(move.getStartPosition()).contains(move)) {
+                    throw new InvalidMoveException("Invalid move for " + piece.getPieceType());
+                }
+                if (move.getPromotionPiece() == null) {
+                    board.addPiece(move.getEndPosition(), piece);
+                    replaceNull(board, move);
+                    switchTurn(piece);
+                } else {
+                    ChessPiece promotionPiece = new ChessPiece(team, move.getPromotionPiece());
+                    board.addPiece(move.getEndPosition(), promotionPiece);
+                    replaceNull(board, move);
+                    switchTurn(piece);
+                }
             }
         } catch (InvalidMoveException e) {
             throw new InvalidMoveException();
@@ -220,6 +224,7 @@ public class ChessGame {
                     }
                 }
             }
+            setGameOver(true);
             return true;
         }
         else{
@@ -265,6 +270,7 @@ public class ChessGame {
                     }
                 }
             }
+            setGameOver(true);
             return true;
         }
         else{
@@ -299,4 +305,14 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return board;
     }
+
+    public Boolean getGameOver() {
+        return gameOver;
+    }
+
+    public void setGameOver(Boolean gameOver) {
+        this.gameOver = gameOver;
+    }
+
+
 }

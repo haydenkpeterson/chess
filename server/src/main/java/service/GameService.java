@@ -107,6 +107,10 @@ public class GameService {
         }
     }
 
+    public void resign(GameData game, int gameID) throws DataAccessException, SQLException {
+        gameDAO.makeMove(game.game(), gameID);
+    }
+
     public AuthData verifyAuth(String authToken) throws SQLException, DataAccessException {
         return getAuth(authToken);
     }
