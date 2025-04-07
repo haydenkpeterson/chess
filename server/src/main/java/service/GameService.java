@@ -9,14 +9,10 @@ import model.AuthData;
 import model.GameData;
 
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.*;
 
 import dataaccess.AuthDAO;
 import model.JoinData;
-
-import java.util.ArrayList;
-import java.util.Set;
 
 public class GameService {
     private final GameDAO gameDAO;
@@ -85,7 +81,7 @@ public class GameService {
         gameDAO.updateGame(authData, joinData);
     }
 
-    public void makeMove(String authToken, int gameID, ChessMove move) throws SQLException, DataAccessException, InvalidMoveException {
+    public void makeMove(String authToken, int gameID, ChessMove move, ChessGame.TeamColor teamColor) throws SQLException, DataAccessException, InvalidMoveException {
         AuthData authData = getAuth(authToken);
         boolean valid = false;
         if(authData == null)
@@ -93,16 +89,26 @@ public class GameService {
             throw new DataAccessException("Error: unauthorized");
         }
         GameData gameData = gameDAO.findGameFromId(gameID);
-        ChessGame game = gameData.game();
-        for(ChessMove validMove : game.validMoves(move.getStartPosition())){
-            if(validMove == move){
-                game.makeMove(move);
-                valid = true;
+        if(teamColor == gameData.game().getTeamTurn()) {
+            ChessGame game = gameData.game();
+            for (ChessMove validMove : game.validMoves(move.getStartPosition())) {
+                if (Objects.equals(validMove, move)) {
+                    game.makeMove(move);
+                    gameDAO.makeMove(game, gameID);
+                    valid = true;
+                }
             }
+        }
+        else{
+            throw new InvalidMoveException("Error: Wrong Turn");
         }
         if(!valid) {
             throw new InvalidMoveException("Error: Invalid Move");
         }
+    }
+
+    public AuthData verifyAuth(String authToken) throws SQLException, DataAccessException {
+        return getAuth(authToken);
     }
 
     private int generateID() {

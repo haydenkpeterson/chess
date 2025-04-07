@@ -1,8 +1,11 @@
 package server.websocket;
 
 import org.eclipse.jetty.websocket.api.Session;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,15 +23,28 @@ public class ConnectionManager {
         connections.remove(name);
     }
 
-    public void broadcast(String excludeVisitorName, NotificationMessage notificationMessage) throws IOException {
+    public void broadcast(String excludeVisitorName, ServerMessage message) throws IOException {
         var removeList = new ArrayList<Connection>();
-        for (var c : connections.values()) {
-            if (c.session.isOpen()) {
-                if (!c.token.equals(excludeVisitorName)) {
-                    c.send(notificationMessage.toString());
+        if(message instanceof LoadGameMessage loadGameMessage) {
+            for (var c : connections.values()) {
+                if (c.session.isOpen()) {
+                    String msg = new Gson().toJson(loadGameMessage);
+                    c.send(msg);
+                } else {
+                    removeList.add(c);
                 }
-            } else {
-                removeList.add(c);
+            }
+        }
+        if(message instanceof NotificationMessage notificationMessage) {
+            for (var c : connections.values()) {
+                if (c.session.isOpen()) {
+                    if (!c.token.equals(excludeVisitorName)) {
+                        String msg = new Gson().toJson(notificationMessage);
+                        c.send(msg);
+                    }
+                } else {
+                    removeList.add(c);
+                }
             }
         }
 
@@ -38,13 +54,23 @@ public class ConnectionManager {
         }
     }
 
-    public void sendMsg(String token, ServerMessage message) throws IOException {
+    public void sendMsg(Session session, String token, ServerMessage message) throws IOException {
         Connection connection = connections.get(token);
-        if (connection != null) {
-            if (connection.session.isOpen()) {
-                connection.send(message.toString());
-            } else {
-                connections.remove(token);
+        if (connection == null) {
+            if (session.isOpen()) {
+                String msg = new Gson().toJson(message);
+                session.getRemote().sendString(msg);
+            }
+            return;
+        }
+        if (connection.session.isOpen()) {
+            if (message instanceof LoadGameMessage loadGameMessage) {
+                String msg = new Gson().toJson(loadGameMessage);
+                connection.send(msg);
+            }
+            if (message instanceof ErrorMessage errorMessage) {
+                String msg = new Gson().toJson(errorMessage);
+                connection.send(msg);
             }
         }
     }

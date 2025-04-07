@@ -45,23 +45,22 @@ public class WebSocketHandler {
     }
 
     private void connect(String token, int id, Session session) throws IOException, SQLException, DataAccessException {
+        if(service.verifyAuth(token) == null) {
+            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
+            connections.sendMsg(session, token, error);
+            return;
+        }
         String user = service.getUser(token);
-
         connections.add(token, session, id);
         try {
             GameData game = service.getGameFromID(id);
             if(game == null) {
                 var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
-                connections.sendMsg(token, error);
-            }
-            else if (!game.game().isInStalemate(getTeamColor(user,game)) ||
-                    game.game().isInCheckmate(getTeamColor(user,game))) {
-                var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, "message");
-                connections.broadcast(token, notification);
+                connections.sendMsg(session, token, error);
             }
             else {
                 LoadGameMessage loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
-                connections.sendMsg(token, loadGame);
+                connections.sendMsg(session, token, loadGame);
                 if(getTeamColor(user, game) == null) {
                     var notification = new NotificationMessage(
                             ServerMessage.ServerMessageType.NOTIFICATION, user + " connected to game as observer");
@@ -70,7 +69,7 @@ public class WebSocketHandler {
                 else {
                     var notification = new NotificationMessage(
                             ServerMessage.ServerMessageType.NOTIFICATION,
-                            user + " connected to game as " + getTeamColor(user, game));
+                            user + " connected to game as " + Objects.requireNonNull(getTeamColor(user, game)));
                     connections.broadcast(token, notification);
                 }
             }
@@ -92,11 +91,36 @@ public class WebSocketHandler {
     }
 
     private void makeMove(String token, int id, ChessMove move, Session session) throws SQLException, DataAccessException, InvalidMoveException, IOException {
+        if(service.verifyAuth(token) == null) {
+            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
+            connections.sendMsg(session, token, error);
+            return;
+        }
         String user = service.getUser(token);
         connections.add(token, session, id);
-        service.makeMove(token, id, move);
-        var message = String.format("%s connected as %s", user, "WHITE");
-        var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-        connections.broadcast(user, notification);
+        try {
+            GameData game = service.getGameFromID(id);
+            if(game == null) {
+                var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
+                connections.sendMsg(session, token, error);
+            }
+            else {
+                try {
+                    service.makeMove(token, id, move, getTeamColor(user, game));
+                } catch (InvalidMoveException e) {
+                    var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
+                    connections.sendMsg(session, token, error);
+                    return;
+                }
+                game = service.getGameFromID(id);
+                LoadGameMessage loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+                connections.broadcast(token, loadGame);
+                var message = String.format("%s connected as %s", user, Objects.requireNonNull(getTeamColor(user, game)));
+                var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+                connections.broadcast(token, notification);
+            }
+        } catch (SQLException | DataAccessException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
