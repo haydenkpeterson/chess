@@ -57,7 +57,7 @@ public class WebSocketHandler {
         service.leave(getTeamColor(user, game), id);
         var notification = new NotificationMessage(
                 ServerMessage.ServerMessageType.NOTIFICATION, user + " has left");
-        connections.broadcast(token, notification);
+        connections.broadcast(id, token, notification);
         connections.remove(token);
     }
 
@@ -84,7 +84,7 @@ public class WebSocketHandler {
                         service.resign(game, id);
                         var notification = new NotificationMessage(
                                 ServerMessage.ServerMessageType.NOTIFICATION, user + " has resigned");
-                        connections.broadcast(token, notification);
+                        connections.broadcast(id, token, notification);
                         connections.sendMsg(session, token, notification);
                     }
                 }
@@ -118,13 +118,13 @@ public class WebSocketHandler {
                 if(getTeamColor(user, game) == null) {
                     var notification = new NotificationMessage(
                             ServerMessage.ServerMessageType.NOTIFICATION, user + " connected to game as observer");
-                    connections.broadcast(token, notification);
+                    connections.broadcast(id, token, notification);
                 }
                 else {
                     var notification = new NotificationMessage(
                             ServerMessage.ServerMessageType.NOTIFICATION,
                             user + " connected to game as " + Objects.requireNonNull(getTeamColor(user, game)));
-                    connections.broadcast(token, notification);
+                    connections.broadcast(id, token, notification);
                 }
             }
         } catch (SQLException | DataAccessException | IOException e) {
@@ -168,10 +168,10 @@ public class WebSocketHandler {
                     }
                     game = service.getGameFromID(id);
                     LoadGameMessage loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
-                    connections.broadcast(token, loadGame);
+                    connections.broadcast(id, token, loadGame);
                     var message = String.format("%s connected as %s", user, Objects.requireNonNull(getTeamColor(user, game)));
                     var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-                    connections.broadcast(token, notification);
+                    connections.broadcast(id, token, notification);
                 }
                 else{
                     var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");

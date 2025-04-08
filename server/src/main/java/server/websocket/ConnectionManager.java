@@ -13,20 +13,31 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
     public final ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<Integer, ConcurrentHashMap<String, Connection>> gameConnections
+            = new ConcurrentHashMap<>();
 
     public void add(String token, Session session, int gameID) {
         var connection = new Connection(token, session, gameID);
-        connections.put(token, connection);
+        gameConnections.computeIfAbsent(gameID, k -> new ConcurrentHashMap<>())
+                .put(token, connection);
     }
 
-    public void remove(String name) {
-        connections.remove(name);
+    public void remove(String token) {
+        for (var game : gameConnections.values()) {
+            if (game.remove(token) != null) {
+                break;
+            }
+        }
     }
 
-    public void broadcast(String excludeVisitorName, ServerMessage message) throws IOException {
+    public void broadcast(int gameID, String excludeVisitorName, ServerMessage message) throws IOException {
+        ConcurrentHashMap<String, Connection> gameMap = gameConnections.get(gameID);
+        if (gameMap == null) {
+            return;
+        }
         var removeList = new ArrayList<Connection>();
         if(message instanceof LoadGameMessage loadGameMessage) {
-            for (var c : connections.values()) {
+            for (var c : gameMap.values()) {
                 if (c.session.isOpen()) {
                     String msg = new Gson().toJson(loadGameMessage);
                     c.send(msg);
@@ -36,7 +47,7 @@ public class ConnectionManager {
             }
         }
         if(message instanceof NotificationMessage notificationMessage) {
-            for (var c : connections.values()) {
+            for (var c : gameMap.values()) {
                 if (c.session.isOpen()) {
                     if (!c.token.equals(excludeVisitorName)) {
                         String msg = new Gson().toJson(notificationMessage);
@@ -48,9 +59,9 @@ public class ConnectionManager {
             }
         }
 
-        // Clean up any connections that were left open.
+        // Clean up any connections that were left open
         for (var c : removeList) {
-            connections.remove(c.token);
+            gameMap.remove(c.token);
         }
     }
 
