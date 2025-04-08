@@ -1,5 +1,6 @@
 package client;
 
+import client.websocket.NotificationHandler;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
@@ -27,10 +28,12 @@ public class Client {
     private State state = State.SIGNEDOUT;
     private AuthData auth;
     private Map<Integer, GameData> gameMap = new HashMap<>();
+    private final NotificationHandler notificationHandler;
 
-    public Client(String serverUrl) {
+    public Client(String serverUrl, NotificationHandler notificationHandler) {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
+        this.notificationHandler = notificationHandler;
     }
 
     public String eval(String input) {
