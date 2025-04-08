@@ -94,7 +94,7 @@ public class GameService {
             for (ChessMove validMove : game.validMoves(move.getStartPosition())) {
                 if (Objects.equals(validMove, move)) {
                     game.makeMove(move);
-                    gameDAO.makeMove(game, gameID);
+                    gameDAO.replaceGame(game, gameID);
                     valid = true;
                 }
             }
@@ -107,8 +107,12 @@ public class GameService {
         }
     }
 
+    public void leave(ChessGame.TeamColor color, int gameID) throws DataAccessException {
+        gameDAO.leaveGame(gameID, color);
+    }
+
     public void resign(GameData game, int gameID) throws DataAccessException, SQLException {
-        gameDAO.makeMove(game.game(), gameID);
+        gameDAO.replaceGame(game.game(), gameID);
     }
 
     public AuthData verifyAuth(String authToken) throws SQLException, DataAccessException {

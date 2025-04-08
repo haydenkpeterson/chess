@@ -42,7 +42,23 @@ public class WebSocketHandler {
             makeMove(moveCommand.getAuthToken(), moveCommand.getGameID(), moveCommand.move, session);
             }
             case RESIGN -> resign(command.getAuthToken(), command.getGameID(), session);
+            case LEAVE -> leave(command.getAuthToken(), command.getGameID(), session);
         }
+    }
+
+    private void leave(String token, Integer id, Session session) throws IOException, SQLException, DataAccessException {
+        if(service.verifyAuth(token) == null) {
+            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
+            connections.sendMsg(session, token, error);
+            return;
+        }
+        String user = service.getUser(token);
+        GameData game = service.getGameFromID(id);
+        service.leave(getTeamColor(user, game), id);
+        var notification = new NotificationMessage(
+                ServerMessage.ServerMessageType.NOTIFICATION, user + " has left");
+        connections.broadcast(token, notification);
+        connections.remove(token);
     }
 
     private void resign(String token, Integer id, Session session) throws SQLException, DataAccessException, IOException {
@@ -52,7 +68,6 @@ public class WebSocketHandler {
             return;
         }
         String user = service.getUser(token);
-        connections.add(token, session, id);
         try {
             GameData game = service.getGameFromID(id);
             if(game == null) {
@@ -60,17 +75,22 @@ public class WebSocketHandler {
                 connections.sendMsg(session, token, error);
             }
             else {
-                if(getTeamColor(user, game) == null) {
-                    var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
-                    connections.sendMsg(session, token, error);
+                if(!game.game().getGameOver()) {
+                    if (getTeamColor(user, game) == null) {
+                        var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
+                        connections.sendMsg(session, token, error);
+                    } else {
+                        game.game().setGameOver(true);
+                        service.resign(game, id);
+                        var notification = new NotificationMessage(
+                                ServerMessage.ServerMessageType.NOTIFICATION, user + " has resigned");
+                        connections.broadcast(token, notification);
+                        connections.sendMsg(session, token, notification);
+                    }
                 }
                 else {
-                    game.game().setGameOver(true);
-                    service.resign(game, id);
-                    var notification = new NotificationMessage(
-                            ServerMessage.ServerMessageType.NOTIFICATION, user + " has resigned");
-                    connections.broadcast(token, notification);
-                    connections.sendMsg(session, token, notification);
+                    var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
+                    connections.sendMsg(session, token, error);
                 }
             }
         } catch (SQLException | DataAccessException | IOException e) {
@@ -131,7 +151,6 @@ public class WebSocketHandler {
             return;
         }
         String user = service.getUser(token);
-        connections.add(token, session, id);
         try {
             GameData game = service.getGameFromID(id);
             if(game == null) {
@@ -139,19 +158,25 @@ public class WebSocketHandler {
                 connections.sendMsg(session, token, error);
             }
             else {
-                try {
-                    service.makeMove(token, id, move, getTeamColor(user, game));
-                } catch (InvalidMoveException e) {
+                if(!game.game().getGameOver()) {
+                    try {
+                        service.makeMove(token, id, move, getTeamColor(user, game));
+                    } catch (InvalidMoveException e) {
+                        var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
+                        connections.sendMsg(session, token, error);
+                        return;
+                    }
+                    game = service.getGameFromID(id);
+                    LoadGameMessage loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+                    connections.broadcast(token, loadGame);
+                    var message = String.format("%s connected as %s", user, Objects.requireNonNull(getTeamColor(user, game)));
+                    var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+                    connections.broadcast(token, notification);
+                }
+                else{
                     var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
                     connections.sendMsg(session, token, error);
-                    return;
                 }
-                game = service.getGameFromID(id);
-                LoadGameMessage loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
-                connections.broadcast(token, loadGame);
-                var message = String.format("%s connected as %s", user, Objects.requireNonNull(getTeamColor(user, game)));
-                var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-                connections.broadcast(token, notification);
             }
         } catch (SQLException | DataAccessException | IOException e) {
             throw new RuntimeException(e);

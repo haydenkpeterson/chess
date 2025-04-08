@@ -36,7 +36,12 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     @Override
-    public void makeMove(ChessGame game, int gameID) throws DataAccessException {
+    public void replaceGame(ChessGame game, int gameID) throws DataAccessException {
+    }
+
+    @Override
+    public void leaveGame(int gameID, ChessGame.TeamColor color) {
+
     }
 
     @Override
