@@ -68,91 +68,116 @@ public class Client {
     }
 
     public String register(String... params) throws ResponseException {
-        try {
-            if (params.length == 3) {
-                state = State.SIGNEDIN;
-                String username = params[0];
-                visitorName = username;
-                String password = params[1];
-                String email = params[2];
-                UserData user = new UserData(username, password, email);
-                auth = server.register(user);
-                return String.format("Registered as %s.", user.username()) + "\n" + help();
-            } else {
-                return "Expected <USERNAME> <PASSWORD> <EMAIL>";
+        if(state == State.SIGNEDOUT) {
+            try {
+                if (params.length == 3) {
+                    state = State.SIGNEDIN;
+                    String username = params[0];
+                    visitorName = username;
+                    String password = params[1];
+                    String email = params[2];
+                    UserData user = new UserData(username, password, email);
+                    auth = server.register(user);
+                    return String.format("Registered as %s.", user.username()) + "\n" + help();
+                } else {
+                    return "Expected <USERNAME> <PASSWORD> <EMAIL>";
+                }
+            } catch (ResponseException e) {
+                state = State.SIGNEDOUT;
+                return "Error registering";
             }
-        } catch (ResponseException e) {
-            state = State.SIGNEDOUT;
-            return "Error registering";
+        }
+        else{
+            return "\n" + help();
         }
     }
 
     public String login(String... params) throws ResponseException {
-        try {
-            if (params.length == 2) {
-                state = State.SIGNEDIN;
-                String username = params[0];
-                visitorName = username;
-                String password = params[1];
-                auth = server.login(new UserData(username, password, ""));
-                return String.format("Logged in as %s.", visitorName) + "\n" + help();
-            } else {
-                return "Expected <USERNAME> <PASSWORD>";
+        if(state == State.SIGNEDOUT) {
+            try {
+                if (params.length == 2) {
+                    state = State.SIGNEDIN;
+                    String username = params[0];
+                    visitorName = username;
+                    String password = params[1];
+                    auth = server.login(new UserData(username, password, ""));
+                    return String.format("Logged in as %s.", visitorName) + "\n" + help();
+                } else {
+                    return "Expected <USERNAME> <PASSWORD>";
+                }
+            } catch (ResponseException e) {
+                state = State.SIGNEDOUT;
+                return "Error logging in.";
             }
-        } catch (ResponseException e) {
-            state = State.SIGNEDOUT;
-            return "Error logging in.";
+        }
+        else{
+            return "\n" + help();
         }
     }
 
     public String logout() throws ResponseException {
-        try {
-            assertSignedIn();
-            if (auth != null) {
-                server.logout(auth);
-                state = State.SIGNEDOUT;
-                auth = null;
-                return String.format("%s logged out.", visitorName);
-            } else {
-                return "Unauthorized.";
+        if(state == State.SIGNEDIN) {
+            try {
+                assertSignedIn();
+                if (auth != null) {
+                    server.logout(auth);
+                    state = State.SIGNEDOUT;
+                    auth = null;
+                    return String.format("%s logged out.", visitorName);
+                } else {
+                    return "Unauthorized.";
+                }
+            } catch (ResponseException e) {
+                return "Error.";
             }
-        } catch (ResponseException e) {
-            return "Error.";
+        }
+        else {
+            return "\n" + help();
         }
     }
 
     public String create(String... params) {
-        try {
-            if (auth != null) {
-                String name = params[0];
-                server.createGame(auth, new ServerFacade.Game(name));
-                return String.format("Created game: %s.", name);
-            } else {
-                return "Unauthorized.";
+        if(state == State.SIGNEDIN) {
+            try {
+                if (auth != null) {
+                    String name = params[0];
+                    server.createGame(auth, new ServerFacade.Game(name));
+                    return String.format("Created game: %s.", name);
+                } else {
+                    return "Unauthorized.";
+                }
+            } catch (ResponseException e) {
+                return "Error.";
             }
-        } catch (ResponseException e) {
-            return "Error.";
+        }
+        else{
+            return "\n" + help();
         }
     }
 
     public String listGames() throws ResponseException {
-        try {
-            if (auth != null) {
-                GameData[] games = server.listGames(auth);
-                int num = 1;
-                StringBuilder result = new StringBuilder();
-                for (GameData game : games) {
-                    gameMap.put(num, game);
-                    result.append(String.format("%d: white: %s, black: %s, game: %s\n",
-                            num, game.whiteUsername(), game.blackUsername(), game.gameName()));
-                    num++;
+        if(state == State.SIGNEDIN) {
+            try {
+                if (auth != null) {
+                    GameData[] games = server.listGames(auth);
+                    int num = 1;
+                    StringBuilder result = new StringBuilder();
+                    for (GameData game : games) {
+                        gameMap.put(num, game);
+                        result.append(String.format("%d: white: %s, black: %s, game: %s\n",
+                                num, game.whiteUsername(), game.blackUsername(), game.gameName()));
+                        num++;
+                    }
+                    return result.toString();
+                } else {
+                    return "Unauthorized.";
                 }
-                return result.toString();
-            } else {
-                return "Unauthorized.";
+            } catch (ResponseException e) {
+                return "Error.";
             }
-        } catch (ResponseException e) {
-            return "Error.";
+        }
+        else {
+            return "\n" + help();
         }
     }
 
@@ -179,57 +204,77 @@ public class Client {
     }
 
     public String joinGame(String... params) {
-        try {
-            if (auth != null) {
-                try {
-                    return makeJoin(params);
-                } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-                    return "Invalid game.";
+        if(state == State.SIGNEDIN) {
+            try {
+                if (auth != null) {
+                    try {
+                        return makeJoin(params);
+                    } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                        return "Invalid game.";
+                    }
+                } else {
+                    return "Unauthorized.";
                 }
-            } else {
-                return "Unauthorized.";
+            } catch (ResponseException e) {
+                return "Error.";
             }
-        } catch (ResponseException e) {
-            return "Error.";
+        }
+        else {
+            return "\n" + help();
         }
     }
 
     public String observe(String... params) {
-        try {
-            int num = Integer.parseInt(params[0]);
-            for (Map.Entry<Integer, GameData> entry : gameMap.entrySet()) {
-                if (entry.getKey() == num) {
+        if(state == State.SIGNEDIN) {
+            try {
+                int num = Integer.parseInt(params[0]);
+                for (Map.Entry<Integer, GameData> entry : gameMap.entrySet()) {
+                    if (entry.getKey() == num) {
 
-                    GameData game = entry.getValue();
-                    int gameID = game.gameID();
-                    ws = new WebSocketFacade(serverUrl, notificationHandler);
-                    ws.connect(auth.authToken(), gameID);
+                        GameData game = entry.getValue();
+                        int gameID = game.gameID();
+                        ws = new WebSocketFacade(serverUrl, notificationHandler);
+                        ws.connect(auth.authToken(), gameID);
 
-                    return createBoard("WHITE", game.game());
+                        return createBoard("WHITE", game.game()) + "\n" + help();
+                    }
                 }
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                return "Invalid game.";
+            } catch (ResponseException e) {
+                throw new RuntimeException(e);
             }
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-            return "Invalid game.";
-        } catch (ResponseException e) {
-            throw new RuntimeException(e);
+            return "Game does not exist.";
         }
-        return "Game does not exist.";
+        else {
+            return "\n" + help();
+        }
     }
 
     public String redraw() {
-        return createBoard(storedColor.toUpperCase(), storedGame.game());
+        if(state == State.GAMEPLAY) {
+            return createBoard(storedColor.toUpperCase(), storedGame.game());
+        }
+        else {
+            return "\n" + help();
+        }
     }
 
     public String leave() throws ResponseException {
-        try {
-            int gameID = storedGame.gameID();
-            ws = new WebSocketFacade(serverUrl, notificationHandler);
-            ws.leave(auth.authToken(), gameID);
-            state = State.SIGNEDIN;
-            return "\n" + help();
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
+        if(state == State.GAMEPLAY) {
+            try {
+                int gameID = storedGame.gameID();
+                ws = new WebSocketFacade(serverUrl, notificationHandler);
+                ws.leave(auth.authToken(), gameID);
+                state = State.SIGNEDIN;
+                return "\n" + help();
+            } catch (RuntimeException e) {
+                throw new RuntimeException(e);
+            }
         }
+        else {
+                return "\n" + help();
+            }
     }
 
     public String[][] boardArrayWhite() {
