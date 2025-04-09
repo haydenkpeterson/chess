@@ -123,7 +123,7 @@ public class Client {
                     server.logout(auth);
                     state = State.SIGNEDOUT;
                     auth = null;
-                    return String.format("%s logged out.", visitorName);
+                    return String.format("%s logged out.", visitorName) + "\n" + help();
                 } else {
                     return "Unauthorized.";
                 }

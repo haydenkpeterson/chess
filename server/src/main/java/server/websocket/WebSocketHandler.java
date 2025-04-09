@@ -54,7 +54,9 @@ public class WebSocketHandler {
         }
         String user = service.getUser(token);
         GameData game = service.getGameFromID(id);
-        service.leave(getTeamColor(user, game), id);
+        if(Objects.equals(game.whiteUsername(), user) || Objects.equals(game.blackUsername(), user)) {
+            service.leave(getTeamColor(user, game), id);
+        }
         var notification = new NotificationMessage(
                 ServerMessage.ServerMessageType.NOTIFICATION, user + " has left");
         connections.broadcast(id, token, notification);
