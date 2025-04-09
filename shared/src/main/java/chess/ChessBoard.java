@@ -58,6 +58,10 @@ public class ChessBoard {
         }
     }
 
+    public ChessPiece[][] getBoard() {
+        return board;
+    }
+
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)

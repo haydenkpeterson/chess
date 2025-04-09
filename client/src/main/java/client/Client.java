@@ -1,6 +1,10 @@
 package client;
 
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPiece;
 import client.websocket.NotificationHandler;
+import client.websocket.WebSocketFacade;
 import exception.ResponseException;
 import model.AuthData;
 import model.GameData;
@@ -19,7 +23,8 @@ public class Client {
 
     public enum State {
         SIGNEDOUT,
-        SIGNEDIN
+        SIGNEDIN,
+        GAMEPLAY
     }
 
     private String visitorName = null;
@@ -29,6 +34,9 @@ public class Client {
     private AuthData auth;
     private Map<Integer, GameData> gameMap = new HashMap<>();
     private final NotificationHandler notificationHandler;
+    private WebSocketFacade ws;
+    private GameData storedGame;
+    private String storedColor;
 
     public Client(String serverUrl, NotificationHandler notificationHandler) {
         server = new ServerFacade(serverUrl);
@@ -50,6 +58,8 @@ public class Client {
                 case "join" -> joinGame(params);
                 case "create" -> create(params);
                 case "observe" -> observe(params);
+                case "redraw" -> redraw();
+                case "leave" -> leave();
                 default -> help();
             };
         } catch (ResponseException ex) {
@@ -113,7 +123,7 @@ public class Client {
 
     public String create(String... params) {
         try {
-            if(auth != null) {
+            if (auth != null) {
                 String name = params[0];
                 server.createGame(auth, new ServerFacade.Game(name));
                 return String.format("Created game: %s.", name);
@@ -127,11 +137,11 @@ public class Client {
 
     public String listGames() throws ResponseException {
         try {
-            if(auth != null) {
+            if (auth != null) {
                 GameData[] games = server.listGames(auth);
                 int num = 1;
                 StringBuilder result = new StringBuilder();
-                for(GameData game : games) {
+                for (GameData game : games) {
                     gameMap.put(num, game);
                     result.append(String.format("%d: white: %s, black: %s, game: %s\n",
                             num, game.whiteUsername(), game.blackUsername(), game.gameName()));
@@ -154,8 +164,15 @@ public class Client {
                 GameData game = entry.getValue();
                 int gameID = game.gameID();
                 server.updateGame(auth, new JoinData(color.toUpperCase(), gameID));
-                String board = createBoard(color.toUpperCase());
-                return board + "\n" + String.format("%s joined game %d as %s.", visitorName, num, color);
+                storedColor = color;
+                storedGame = game;
+
+                ws = new WebSocketFacade(serverUrl, notificationHandler);
+                ws.connect(auth.authToken(), gameID);
+
+                state = State.GAMEPLAY;
+                String board = createBoard(color.toUpperCase(), game.game());
+                return board + "\n" + String.format("%s joined game %d as %s.", visitorName, num, color) + "\n" + help();
             }
         }
         return "Game does not exist.";
@@ -163,7 +180,7 @@ public class Client {
 
     public String joinGame(String... params) {
         try {
-            if(auth != null) {
+            if (auth != null) {
                 try {
                     return makeJoin(params);
                 } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
@@ -182,64 +199,87 @@ public class Client {
             int num = Integer.parseInt(params[0]);
             for (Map.Entry<Integer, GameData> entry : gameMap.entrySet()) {
                 if (entry.getKey() == num) {
-                    return createBoard("WHITE");
+
+                    GameData game = entry.getValue();
+                    int gameID = game.gameID();
+                    ws = new WebSocketFacade(serverUrl, notificationHandler);
+                    ws.connect(auth.authToken(), gameID);
+
+                    return createBoard("WHITE", game.game());
                 }
             }
         } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
             return "Invalid game.";
+        } catch (ResponseException e) {
+            throw new RuntimeException(e);
         }
         return "Game does not exist.";
+    }
 
+    public String redraw() {
+        return createBoard(storedColor.toUpperCase(), storedGame.game());
+    }
+
+    public String leave() throws ResponseException {
+        try {
+            int gameID = storedGame.gameID();
+            ws = new WebSocketFacade(serverUrl, notificationHandler);
+            ws.leave(auth.authToken(), gameID);
+            state = State.SIGNEDIN;
+            return "\n" + help();
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String[][] boardArrayWhite() {
         return new String[][]{
-            {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP,
-                    BLACK_QUEEN, BLACK_KING, BLACK_BISHOP,
-                    BLACK_KNIGHT, BLACK_ROOK},
-            {BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
-                    BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
-                    BLACK_PAWN, BLACK_PAWN},
-            {EMPTY, EMPTY, EMPTY, EMPTY,
-                    EMPTY, EMPTY, EMPTY, EMPTY},
-            {EMPTY, EMPTY, EMPTY, EMPTY,
-                    EMPTY, EMPTY, EMPTY, EMPTY},
-            {EMPTY, EMPTY, EMPTY, EMPTY,
-                    EMPTY, EMPTY, EMPTY, EMPTY},
-            {EMPTY, EMPTY, EMPTY, EMPTY,
-                    EMPTY, EMPTY, EMPTY, EMPTY},
-            {WHITE_PAWN, WHITE_PAWN, WHITE_PAWN,
-                    WHITE_PAWN, WHITE_PAWN, WHITE_PAWN,
-                    WHITE_PAWN, WHITE_PAWN},
-            {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP,
-                    WHITE_QUEEN, WHITE_KING, WHITE_BISHOP,
-                    WHITE_KNIGHT, WHITE_ROOK}
+                {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP,
+                        BLACK_QUEEN, BLACK_KING, BLACK_BISHOP,
+                        BLACK_KNIGHT, BLACK_ROOK},
+                {BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
+                        BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
+                        BLACK_PAWN, BLACK_PAWN},
+                {EMPTY, EMPTY, EMPTY, EMPTY,
+                        EMPTY, EMPTY, EMPTY, EMPTY},
+                {EMPTY, EMPTY, EMPTY, EMPTY,
+                        EMPTY, EMPTY, EMPTY, EMPTY},
+                {EMPTY, EMPTY, EMPTY, EMPTY,
+                        EMPTY, EMPTY, EMPTY, EMPTY},
+                {EMPTY, EMPTY, EMPTY, EMPTY,
+                        EMPTY, EMPTY, EMPTY, EMPTY},
+                {WHITE_PAWN, WHITE_PAWN, WHITE_PAWN,
+                        WHITE_PAWN, WHITE_PAWN, WHITE_PAWN,
+                        WHITE_PAWN, WHITE_PAWN},
+                {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP,
+                        WHITE_QUEEN, WHITE_KING, WHITE_BISHOP,
+                        WHITE_KNIGHT, WHITE_ROOK}
 
         };
     }
 
     public String[][] boardArrayBlack() {
         return new String[][]{
-            {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP,
-                    WHITE_KING, WHITE_QUEEN, WHITE_BISHOP,
-                    WHITE_KNIGHT, WHITE_ROOK},
-            {WHITE_PAWN, WHITE_PAWN, WHITE_PAWN,
-                    WHITE_PAWN, WHITE_PAWN, WHITE_PAWN,
-                    WHITE_PAWN, WHITE_PAWN},
-            {EMPTY, EMPTY, EMPTY, EMPTY,
-                    EMPTY, EMPTY, EMPTY, EMPTY},
-            {EMPTY, EMPTY, EMPTY, EMPTY,
-                    EMPTY, EMPTY, EMPTY, EMPTY},
-            {EMPTY, EMPTY, EMPTY, EMPTY,
-                    EMPTY, EMPTY, EMPTY, EMPTY},
-            {EMPTY, EMPTY, EMPTY, EMPTY,
-                    EMPTY, EMPTY, EMPTY, EMPTY},
-            {BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
-                    BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
-                    BLACK_PAWN, BLACK_PAWN},
-            {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP,
-                    BLACK_KING, BLACK_QUEEN, BLACK_BISHOP,
-                    BLACK_KNIGHT, BLACK_ROOK}
+                {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP,
+                        WHITE_KING, WHITE_QUEEN, WHITE_BISHOP,
+                        WHITE_KNIGHT, WHITE_ROOK},
+                {WHITE_PAWN, WHITE_PAWN, WHITE_PAWN,
+                        WHITE_PAWN, WHITE_PAWN, WHITE_PAWN,
+                        WHITE_PAWN, WHITE_PAWN},
+                {EMPTY, EMPTY, EMPTY, EMPTY,
+                        EMPTY, EMPTY, EMPTY, EMPTY},
+                {EMPTY, EMPTY, EMPTY, EMPTY,
+                        EMPTY, EMPTY, EMPTY, EMPTY},
+                {EMPTY, EMPTY, EMPTY, EMPTY,
+                        EMPTY, EMPTY, EMPTY, EMPTY},
+                {EMPTY, EMPTY, EMPTY, EMPTY,
+                        EMPTY, EMPTY, EMPTY, EMPTY},
+                {BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
+                        BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
+                        BLACK_PAWN, BLACK_PAWN},
+                {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP,
+                        BLACK_KING, BLACK_QUEEN, BLACK_BISHOP,
+                        BLACK_KNIGHT, BLACK_ROOK}
         };
     }
 
@@ -263,37 +303,36 @@ public class Client {
         }
     }
 
-    public String displayBoardBlack() {
+    public String displayBoardBlack(ChessBoard chessBoard) {
         StringBuilder boardDisplay = new StringBuilder();
-        String[][] board = boardArrayBlack();
+        String[][] board = reverseBoard(transformBoard(chessBoard));
 
         boardDisplay.append(RESET_TEXT_COLOR);
         boardDisplay.append("   h   g   f  e   d   c  b   a\n");
 
         for (int i = 0; i < board.length; i++) {
             boardDisplay.append(1 + i).append(" ");
-            addPieces(board, i , boardDisplay);
+            addPieces(board, i, boardDisplay);
             boardDisplay.append(" ").append(1 + i).append("\n");
         }
         boardDisplay.append("   h   g   f  e   d   c  b   a\n");
         return boardDisplay.toString();
     }
 
-    private String createBoard(String color) {
-        if(Objects.equals(color, "WHITE")) {
-            return displayBoardWhite();
+    private String createBoard(String color, ChessGame game) {
+        if (Objects.equals(color, "WHITE")) {
+            return displayBoardWhite(game.getBoard());
         }
-        if(Objects.equals(color, "BLACK")) {
-            return displayBoardBlack();
-        }
-        else{
+        if (Objects.equals(color, "BLACK")) {
+            return displayBoardBlack(game.getBoard());
+        } else {
             return "Invalid Color";
         }
     }
 
-    public String displayBoardWhite() {
+    public String displayBoardWhite(ChessBoard chessBoard) {
         StringBuilder boardDisplay = new StringBuilder();
-        String[][] board = boardArrayWhite();
+        String[][] board = transformBoard(chessBoard);
 
         boardDisplay.append(RESET_TEXT_COLOR);
         boardDisplay.append("   a   b   c  d   e   f  g   h\n");
@@ -338,6 +377,15 @@ public class Client {
                     - help - with possible commands
                     """;
         }
+        if (state == State.GAMEPLAY) {
+            return """
+                    - redraw - board
+                    - leave
+                    - make move
+                    - resign
+                    - highlight - legal moves
+                    """;
+        }
         return """
                 - create <name> - a game
                 - list - games
@@ -355,5 +403,74 @@ public class Client {
         }
     }
 
+    private String[][] transformBoard(ChessBoard board) {
+        String[][] transformBoard = new String[8][8];
+        for (int i = 0; i <= 7; i++) {
+            for (int j = 0; j <= 7; j++) {
+                if (board.getBoard()[i][j] == null) {
+                    transformBoard[i][j] = EMPTY;
+                } else {
+                    ChessPiece piece = board.getBoard()[i][j];
 
+                    if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                        switch (piece.getPieceType()) {
+                            case KING:
+                                transformBoard[i][j] = WHITE_KING;
+                                break;
+                            case QUEEN:
+                                transformBoard[i][j] = WHITE_QUEEN;
+                                break;
+                            case BISHOP:
+                                transformBoard[i][j] = WHITE_BISHOP;
+                                break;
+                            case KNIGHT:
+                                transformBoard[i][j] = WHITE_KNIGHT;
+                                break;
+                            case ROOK:
+                                transformBoard[i][j] = WHITE_ROOK;
+                                break;
+                            case PAWN:
+                                transformBoard[i][j] = WHITE_PAWN;
+                                break;
+                        }
+                    }
+                    else if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
+                        switch (piece.getPieceType()) {
+                            case KING:
+                                transformBoard[i][j] = BLACK_KING;
+                                break;
+                            case QUEEN:
+                                transformBoard[i][j] = BLACK_QUEEN;
+                                break;
+                            case BISHOP:
+                                transformBoard[i][j] = BLACK_BISHOP;
+                                break;
+                            case KNIGHT:
+                                transformBoard[i][j] = BLACK_KNIGHT;
+                                break;
+                            case ROOK:
+                                transformBoard[i][j] = BLACK_ROOK;
+                                break;
+                            case PAWN:
+                                transformBoard[i][j] = BLACK_PAWN;
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+        return transformBoard;
+    }
+
+    public String[][] reverseBoard(String[][] board) {
+        String[][] reversedBoard = new String[8][8];
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                reversedBoard[8 - 1 - i][8 - 1 - j] = board[i][j];
+            }
+        }
+
+        return reversedBoard;
+    }
 }
