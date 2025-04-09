@@ -277,57 +277,6 @@ public class Client {
             }
     }
 
-    public String[][] boardArrayWhite() {
-        return new String[][]{
-                {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP,
-                        BLACK_QUEEN, BLACK_KING, BLACK_BISHOP,
-                        BLACK_KNIGHT, BLACK_ROOK},
-                {BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
-                        BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
-                        BLACK_PAWN, BLACK_PAWN},
-                {EMPTY, EMPTY, EMPTY, EMPTY,
-                        EMPTY, EMPTY, EMPTY, EMPTY},
-                {EMPTY, EMPTY, EMPTY, EMPTY,
-                        EMPTY, EMPTY, EMPTY, EMPTY},
-                {EMPTY, EMPTY, EMPTY, EMPTY,
-                        EMPTY, EMPTY, EMPTY, EMPTY},
-                {EMPTY, EMPTY, EMPTY, EMPTY,
-                        EMPTY, EMPTY, EMPTY, EMPTY},
-                {WHITE_PAWN, WHITE_PAWN, WHITE_PAWN,
-                        WHITE_PAWN, WHITE_PAWN, WHITE_PAWN,
-                        WHITE_PAWN, WHITE_PAWN},
-                {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP,
-                        WHITE_QUEEN, WHITE_KING, WHITE_BISHOP,
-                        WHITE_KNIGHT, WHITE_ROOK}
-
-        };
-    }
-
-    public String[][] boardArrayBlack() {
-        return new String[][]{
-                {WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP,
-                        WHITE_KING, WHITE_QUEEN, WHITE_BISHOP,
-                        WHITE_KNIGHT, WHITE_ROOK},
-                {WHITE_PAWN, WHITE_PAWN, WHITE_PAWN,
-                        WHITE_PAWN, WHITE_PAWN, WHITE_PAWN,
-                        WHITE_PAWN, WHITE_PAWN},
-                {EMPTY, EMPTY, EMPTY, EMPTY,
-                        EMPTY, EMPTY, EMPTY, EMPTY},
-                {EMPTY, EMPTY, EMPTY, EMPTY,
-                        EMPTY, EMPTY, EMPTY, EMPTY},
-                {EMPTY, EMPTY, EMPTY, EMPTY,
-                        EMPTY, EMPTY, EMPTY, EMPTY},
-                {EMPTY, EMPTY, EMPTY, EMPTY,
-                        EMPTY, EMPTY, EMPTY, EMPTY},
-                {BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
-                        BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
-                        BLACK_PAWN, BLACK_PAWN},
-                {BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP,
-                        BLACK_KING, BLACK_QUEEN, BLACK_BISHOP,
-                        BLACK_KNIGHT, BLACK_ROOK}
-        };
-    }
-
     public void addPieces(String[][] board, int i, StringBuilder boardDisplay) {
         for (int j = 0; j < board[i].length; j++) {
             boolean isLightSquare = (i + j) % 2 == 0;
