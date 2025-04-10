@@ -300,7 +300,6 @@ public class Client {
                 ws.makeMove(auth.authToken(), storedGame.gameID(), move);
 
                 return "\n" + help();
-
             } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
                 return "Invalid move.";
             } catch (ResponseException e) {

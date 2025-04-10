@@ -182,13 +182,13 @@ public class WebSocketHandler {
                     if(getOppositeColor(game, user) == ChessGame.TeamColor.BLACK) {
                         oppositeName = game.blackUsername();
                     }
-                    if(isInCheckmate(game, user)){
+                    if(isInCheckmate(changedGame, user)){
                         message = String.format("%s is in checkmate", oppositeName);
                         notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
                         connections.broadcast(id, token, notification);
                         connections.sendMsg(session, token, notification);
-                    } else if (isInCheck(game, user)) {
-                        message = String.format("%s is now in check", oppositeName);
+                    } else if (isInCheck(changedGame, user)) {
+                        message = String.format("%s is in check", oppositeName);
                         notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
                         connections.broadcast(id, token, notification);
                         connections.sendMsg(session, token, notification);
