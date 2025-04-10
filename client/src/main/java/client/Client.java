@@ -414,7 +414,6 @@ public class Client {
         return boardDisplay.toString();
     }
 
-
     private static String getPieceColor(String[][] board, int i, int j) {
         String pieceColor;
         if (Objects.equals(board[i][j], WHITE_PAWN) ||

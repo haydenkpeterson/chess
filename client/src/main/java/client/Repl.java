@@ -45,7 +45,12 @@ public class Repl implements NotificationHandler{
             System.out.println(client.redraw());
         }
         else {
-            System.out.println(SET_TEXT_COLOR_RED + message);
+            if(message instanceof ErrorMessage errorMessage){
+                System.out.println(SET_TEXT_COLOR_RED + errorMessage.errorMessage);
+            }
+            if(message instanceof NotificationMessage notificationMessage) {
+                System.out.println(SET_TEXT_COLOR_BLUE + notificationMessage.message);
+            }
             printPrompt();
         }
     }

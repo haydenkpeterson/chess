@@ -171,7 +171,7 @@ public class WebSocketHandler {
                     GameData changedGame = service.getGameFromID(id);
                     LoadGameMessage loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, changedGame);
                     connections.broadcast(id, token, loadGame);
-                    var message = String.format("%s connected as %s", user, Objects.requireNonNull(getTeamColor(user, game)));
+                    var message = String.format("%s made move %s to %s", user, move.getStartPosition().toString(), move.getEndPosition().toString());
                     var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
                     connections.broadcast(id, token, notification);
                 }
@@ -181,7 +181,8 @@ public class WebSocketHandler {
                 }
             }
         } catch (SQLException | DataAccessException | IOException e) {
-            throw new RuntimeException(e);
+            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
+            connections.sendMsg(session, token, error);
         }
     }
 }
