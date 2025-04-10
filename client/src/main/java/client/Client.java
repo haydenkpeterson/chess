@@ -16,6 +16,14 @@ import static client.DrawBoard.*;
 
 public class Client {
 
+    public boolean isResign() {
+        return resign;
+    }
+
+    public void setResign(boolean resign) {
+        this.resign = resign;
+    }
+
     public enum State {
         SIGNEDOUT,
         SIGNEDIN,
@@ -33,7 +41,7 @@ public class Client {
     private GameData storedGame;
     private String storedColor;
     private DrawBoard drawBoard;
-
+    private boolean resign;
 
     public Client(String serverUrl, NotificationHandler notificationHandler) {
         server = new ServerFacade(serverUrl);
@@ -58,13 +66,25 @@ public class Client {
                 case "redraw" -> redraw();
                 case "leave" -> leave();
                 case "move" -> makeMove(params);
-                case "resign" -> resign();
+                case "resign" -> resignAsk();
                 case "highlight" -> highlight(params);
+                case "yes" -> resign();
+                case "no" -> no();
                 default -> help();
             };
         } catch (ResponseException ex) {
             return ex.getMessage();
         }
+    }
+
+    private String no() {
+        setResign(false);
+        return "\n" + help();
+    }
+
+    private String resignAsk() {
+        setResign(true);
+        return "Are you sure you want to resign from this game? (yes/no)";
     }
 
     public String register(String... params) throws ResponseException {
@@ -312,8 +332,9 @@ public class Client {
     }
 
     public String resign() {
-        if(state == State.GAMEPLAY && storedColor != null) {
+        if(state == State.GAMEPLAY && storedColor != null && isResign()) {
             try {
+
                 ws = new WebSocketFacade(serverUrl, notificationHandler);
                 ws.resign(auth.authToken(), storedGame.gameID());
 
@@ -334,8 +355,14 @@ public class Client {
             String startPosition = params[0];
             ChessPosition position = new ChessPosition(getRow(startPosition), getColumn(startPosition));
             highlightedMoves = storedGame.game().validMoves(position);
-            drawBoard = new DrawBoard(storedGame, storedColor.toUpperCase(), highlight);
-            return drawBoard.createBoard(storedColor.toUpperCase(), storedGame.game(), position, highlightedMoves);
+            if(storedColor == null) {
+                drawBoard = new DrawBoard(storedGame, "WHITE", highlight);
+                return drawBoard.createBoard("WHITE", storedGame.game(), position, highlightedMoves);
+            }
+            else {
+                drawBoard = new DrawBoard(storedGame, storedColor.toUpperCase(), highlight);
+                return drawBoard.createBoard(storedColor.toUpperCase(), storedGame.game(), position, highlightedMoves);
+            }
         }
         else {
             return "\n" + help();

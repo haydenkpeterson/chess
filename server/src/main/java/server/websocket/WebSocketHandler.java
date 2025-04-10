@@ -162,6 +162,9 @@ public class WebSocketHandler {
             else {
                 if(!game.game().getGameOver()) {
                     try {
+                        if(game.game().validMoves(move.getStartPosition()) == null) {
+                            throw new InvalidMoveException("Error: invalid move");
+                        }
                         service.makeMove(token, id, move, getTeamColor(user, game));
                     } catch (InvalidMoveException e) {
                         var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: invalid move");
