@@ -4,8 +4,12 @@ import chess.ChessMove;
 import com.google.gson.Gson;
 import exception.ResponseException;
 
+import model.GameData;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 import javax.websocket.*;
 import java.io.IOException;
@@ -33,7 +37,21 @@ public class WebSocketFacade extends Endpoint {
                 @Override
                 public void onMessage(String message) {
                     ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
-                    notificationHandler.notify(serverMessage);
+                    if(serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.LOAD_GAME) {
+                        LoadGameMessage loadGameMessage = new Gson().fromJson(message, LoadGameMessage.class);
+                        notificationHandler.notify(loadGameMessage);
+                    }
+                    if(serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+                        ErrorMessage error = new Gson().fromJson(message, ErrorMessage.class);
+                        notificationHandler.notify(error);
+                    }
+                    if(serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
+                        NotificationMessage notification = new Gson().fromJson(message, NotificationMessage.class);
+                        notificationHandler.notify(notification);
+                    }
+                    else {
+                        notificationHandler.notify(serverMessage);
+                    }
                 }
             });
         } catch (DeploymentException | IOException | URISyntaxException ex) {

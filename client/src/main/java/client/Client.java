@@ -1,8 +1,6 @@
 package client;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
+import chess.*;
 import client.websocket.NotificationHandler;
 import client.websocket.WebSocketFacade;
 import exception.ResponseException;
@@ -60,6 +58,7 @@ public class Client {
                 case "observe" -> observe(params);
                 case "redraw" -> redraw();
                 case "leave" -> leave();
+                case "move" -> makeMove(params);
                 default -> help();
             };
         } catch (ResponseException ex) {
@@ -227,6 +226,7 @@ public class Client {
     public String observe(String... params) {
         if(state == State.SIGNEDIN) {
             try {
+                storedColor = null;
                 int num = Integer.parseInt(params[0]);
                 for (Map.Entry<Integer, GameData> entry : gameMap.entrySet()) {
                     if (entry.getKey() == num) {
@@ -236,7 +236,8 @@ public class Client {
                         ws = new WebSocketFacade(serverUrl, notificationHandler);
                         ws.connect(auth.authToken(), gameID);
 
-                        return createBoard("WHITE", game.game()) + "\n" + help();
+                        state = State.GAMEPLAY;
+                        return "\n" + help();
                     }
                 }
             } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
@@ -253,7 +254,12 @@ public class Client {
 
     public String redraw() {
         if(state == State.GAMEPLAY) {
-            return createBoard(storedColor.toUpperCase(), storedGame.game());
+            if(storedColor == null) {
+                return createBoard("WHITE", storedGame.game());
+            }
+            else {
+                return createBoard(storedColor.toUpperCase(), storedGame.game());
+            }
         }
         else {
             return "\n" + help();
@@ -273,8 +279,62 @@ public class Client {
             }
         }
         else {
+            return "\n" + help();
+        }
+    }
+
+    public String makeMove(String... params) {
+        if(state == State.GAMEPLAY && storedColor != null) {
+            try {
+                String startPosition = params[0];
+                String endPosition = params[1];
+                String promotionPiece = params[2];
+
+                ChessMove move = new ChessMove(new ChessPosition(getRow(startPosition), getColumn(startPosition))
+                        , new ChessPosition(getRow(endPosition), getColumn(endPosition)),
+                        getPromotion(promotionPiece));
+
+                ws = new WebSocketFacade(serverUrl, notificationHandler);
+                ws.makeMove(auth.authToken(), storedGame.gameID(), move);
+
                 return "\n" + help();
+
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+                return "Invalid move.";
+            } catch (ResponseException e) {
+                return e.toString();
             }
+        }
+        else {
+            return "\n" + help();
+        }
+    }
+
+    public static int getRow(String chessPosition) {
+        return Integer.parseInt(chessPosition.substring(1));
+    }
+
+    public static int getColumn(String chessPosition) {
+        char colChar = chessPosition.charAt(0);
+        return Character.toLowerCase(colChar) - 'a' + 1;
+    }
+
+    public static ChessPiece.PieceType getPromotion(String piece) {
+        if(Objects.equals(piece, "knight")) {
+            return ChessPiece.PieceType.KNIGHT;
+        }
+        if(Objects.equals(piece, "queen")) {
+            return ChessPiece.PieceType.QUEEN;
+        }
+        if(Objects.equals(piece, "bishop")) {
+            return ChessPiece.PieceType.BISHOP;
+        }
+        if(Objects.equals(piece, "rook")) {
+            return ChessPiece.PieceType.ROOK;
+        }
+        else{
+            return null;
+        }
     }
 
     public void addPieces(String[][] board, int i, StringBuilder boardDisplay) {
@@ -299,17 +359,24 @@ public class Client {
 
     public String displayBoardBlack(ChessBoard chessBoard) {
         StringBuilder boardDisplay = new StringBuilder();
-        String[][] board = reverseBoard(transformBoard(chessBoard));
+        String[][] transformedBoard = transformBoard(chessBoard);
+        String[][] board = new String[8][8];
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                board[i][7-j] = transformedBoard[i][j];
+            }
+        }
 
         boardDisplay.append(RESET_TEXT_COLOR);
-        boardDisplay.append("   h   g   f  e   d   c  b   a\n");
+        boardDisplay.append("   h   g   f   e   d   c   b   a\n");
 
         for (int i = 0; i < board.length; i++) {
             boardDisplay.append(1 + i).append(" ");
             addPieces(board, i, boardDisplay);
             boardDisplay.append(" ").append(1 + i).append("\n");
         }
-        boardDisplay.append("   h   g   f  e   d   c  b   a\n");
+        boardDisplay.append("   h   g   f   e   d   c   b   a\n");
         return boardDisplay.toString();
     }
 
@@ -326,19 +393,27 @@ public class Client {
 
     public String displayBoardWhite(ChessBoard chessBoard) {
         StringBuilder boardDisplay = new StringBuilder();
-        String[][] board = transformBoard(chessBoard);
+        String[][] transformedBoard = transformBoard(chessBoard);
+        String[][] board = new String[8][8];
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                board[7-i][j] = transformedBoard[i][j];
+            }
+        }
 
         boardDisplay.append(RESET_TEXT_COLOR);
-        boardDisplay.append("   a   b   c  d   e   f  g   h\n");
+        boardDisplay.append("   a   b   c   d   e   f   g   h\n");
 
         for (int i = 0; i < board.length; i++) {
             boardDisplay.append(8 - i).append(" ");
             addPieces(board, i, boardDisplay);
             boardDisplay.append(" ").append(8 - i).append("\n");
         }
-        boardDisplay.append("   a   b   c  d   e   f  g   h\n");
+        boardDisplay.append("   a   b   c   d   e   f   g   h\n");
         return boardDisplay.toString();
     }
+
 
     private static String getPieceColor(String[][] board, int i, int j) {
         String pieceColor;
@@ -375,7 +450,7 @@ public class Client {
             return """
                     - redraw - board
                     - leave
-                    - make move
+                    - move <start square|end square> [promotion piece] - makes a move
                     - resign
                     - highlight - legal moves
                     """;
@@ -456,15 +531,7 @@ public class Client {
         return transformBoard;
     }
 
-    public String[][] reverseBoard(String[][] board) {
-        String[][] reversedBoard = new String[8][8];
-
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                reversedBoard[8 - 1 - i][8 - 1 - j] = board[i][j];
-            }
-        }
-
-        return reversedBoard;
+    public void setStoredGame(GameData game) {
+        storedGame = game;
     }
 }

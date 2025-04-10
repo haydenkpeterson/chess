@@ -3,6 +3,11 @@ package client;
 import java.util.Scanner;
 import static ui.EscapeSequences.*;
 import client.websocket.NotificationHandler;
+import com.google.gson.Gson;
+import model.GameData;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 public class Repl implements NotificationHandler{
@@ -34,8 +39,15 @@ public class Repl implements NotificationHandler{
     }
 
     public void notify(ServerMessage message) {
-        System.out.println(SET_TEXT_COLOR_RED + message);
-        printPrompt();
+        if(message instanceof LoadGameMessage loadGameMessage) {
+            GameData gameData = loadGameMessage.getGame();
+            client.setStoredGame(gameData);
+            System.out.println(client.redraw());
+        }
+        else {
+            System.out.println(SET_TEXT_COLOR_RED + message);
+            printPrompt();
+        }
     }
 
     private void printPrompt() {

@@ -168,8 +168,8 @@ public class WebSocketHandler {
                         connections.sendMsg(session, token, error);
                         return;
                     }
-                    game = service.getGameFromID(id);
-                    LoadGameMessage loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+                    GameData changedGame = service.getGameFromID(id);
+                    LoadGameMessage loadGame = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, changedGame);
                     connections.broadcast(id, token, loadGame);
                     var message = String.format("%s connected as %s", user, Objects.requireNonNull(getTeamColor(user, game)));
                     var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
