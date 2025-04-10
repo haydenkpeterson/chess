@@ -81,7 +81,8 @@ public class GameService {
         gameDAO.updateGame(authData, joinData);
     }
 
-    public void makeMove(String authToken, int gameID, ChessMove move, ChessGame.TeamColor teamColor) throws SQLException, DataAccessException, InvalidMoveException {
+    public void makeMove(String authToken, int gameID, ChessMove move, ChessGame.TeamColor teamColor)
+            throws SQLException, DataAccessException, InvalidMoveException {
         AuthData authData = getAuth(authToken);
         boolean valid = false;
         if(authData == null)

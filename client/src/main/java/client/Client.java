@@ -195,8 +195,7 @@ public class Client {
                 ws.connect(auth.authToken(), gameID);
 
                 state = State.GAMEPLAY;
-                String board = createBoard(color.toUpperCase(), game.game(), null, null);
-                return board + "\n" + String.format("%s joined game %d as %s.", visitorName, num, color) + "\n" + help();
+                return "\n" + String.format("%s joined game %d as %s.", visitorName, num, color) + "\n" + help();
             }
         }
         return "Game does not exist.";
@@ -386,19 +385,10 @@ public class Client {
 
                 boolean isStartPosition = position.equals(startPosition);
 
-                boolean isLegalMove = false;
-                if (highlightedMoves != null) {
-                    for (ChessMove move : highlightedMoves) {
-                        if (move.getEndPosition().equals(position)) {
-                            isLegalMove = true;
-                            break;
-                        }
-                    }
-                }
 
                 if (isStartPosition) {
                     squareColor = SET_BG_COLOR_YELLOW;
-                } else if (isLegalMove) {
+                } else if (isLegalMove(position, highlightedMoves)) {
                     squareColor = SET_BG_COLOR_GREEN;
                 } else if (isLightSquare) {
                     squareColor = SET_BG_COLOR_LIGHT_GREY;
@@ -421,6 +411,17 @@ public class Client {
                     .append(RESET_BG_COLOR)
                     .append(RESET_TEXT_COLOR);
         }
+    }
+
+    public boolean isLegalMove(ChessPosition position, Collection<ChessMove> highlightedMoves) {
+        if (highlightedMoves != null) {
+            for (ChessMove move : highlightedMoves) {
+                if (move.getEndPosition().equals(position)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public String displayBoardBlack(ChessBoard chessBoard, ChessPosition position, Collection<ChessMove> highlightedMoves) {
@@ -520,55 +521,59 @@ public class Client {
         String[][] transformBoard = new String[8][8];
         for (int i = 0; i <= 7; i++) {
             for (int j = 0; j <= 7; j++) {
-                if (board.getBoard()[i][j] == null) {
-                    transformBoard[i][j] = EMPTY;
-                } else {
-                    ChessPiece piece = board.getBoard()[i][j];
+                transformBoard = transform(board, transformBoard, i ,j);
+            }
+        }
+        return transformBoard;
+    }
 
-                    if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
-                        switch (piece.getPieceType()) {
-                            case KING:
-                                transformBoard[i][j] = WHITE_KING;
-                                break;
-                            case QUEEN:
-                                transformBoard[i][j] = WHITE_QUEEN;
-                                break;
-                            case BISHOP:
-                                transformBoard[i][j] = WHITE_BISHOP;
-                                break;
-                            case KNIGHT:
-                                transformBoard[i][j] = WHITE_KNIGHT;
-                                break;
-                            case ROOK:
-                                transformBoard[i][j] = WHITE_ROOK;
-                                break;
-                            case PAWN:
-                                transformBoard[i][j] = WHITE_PAWN;
-                                break;
-                        }
-                    }
-                    else if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
-                        switch (piece.getPieceType()) {
-                            case KING:
-                                transformBoard[i][j] = BLACK_KING;
-                                break;
-                            case QUEEN:
-                                transformBoard[i][j] = BLACK_QUEEN;
-                                break;
-                            case BISHOP:
-                                transformBoard[i][j] = BLACK_BISHOP;
-                                break;
-                            case KNIGHT:
-                                transformBoard[i][j] = BLACK_KNIGHT;
-                                break;
-                            case ROOK:
-                                transformBoard[i][j] = BLACK_ROOK;
-                                break;
-                            case PAWN:
-                                transformBoard[i][j] = BLACK_PAWN;
-                                break;
-                        }
-                    }
+    private String[][] transform(ChessBoard board, String[][] transformBoard, int i, int j) {
+        if (board.getBoard()[i][j] == null) {
+            transformBoard[i][j] = EMPTY;
+        } else {
+            ChessPiece piece = board.getBoard()[i][j];
+
+            if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                switch (piece.getPieceType()) {
+                    case KING:
+                        transformBoard[i][j] = WHITE_KING;
+                        break;
+                    case QUEEN:
+                        transformBoard[i][j] = WHITE_QUEEN;
+                        break;
+                    case BISHOP:
+                        transformBoard[i][j] = WHITE_BISHOP;
+                        break;
+                    case KNIGHT:
+                        transformBoard[i][j] = WHITE_KNIGHT;
+                        break;
+                    case ROOK:
+                        transformBoard[i][j] = WHITE_ROOK;
+                        break;
+                    case PAWN:
+                        transformBoard[i][j] = WHITE_PAWN;
+                        break;
+                }
+            } else if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
+                switch (piece.getPieceType()) {
+                    case KING:
+                        transformBoard[i][j] = BLACK_KING;
+                        break;
+                    case QUEEN:
+                        transformBoard[i][j] = BLACK_QUEEN;
+                        break;
+                    case BISHOP:
+                        transformBoard[i][j] = BLACK_BISHOP;
+                        break;
+                    case KNIGHT:
+                        transformBoard[i][j] = BLACK_KNIGHT;
+                        break;
+                    case ROOK:
+                        transformBoard[i][j] = BLACK_ROOK;
+                        break;
+                    case PAWN:
+                        transformBoard[i][j] = BLACK_PAWN;
+                        break;
                 }
             }
         }

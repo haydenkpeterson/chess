@@ -6,7 +6,6 @@ import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
 import model.GameData;
-import model.JoinData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
@@ -146,7 +145,8 @@ public class WebSocketHandler {
         }
     }
 
-    private void makeMove(String token, int id, ChessMove move, Session session) throws SQLException, DataAccessException, InvalidMoveException, IOException {
+    private void makeMove(String token, int id, ChessMove move, Session session)
+            throws SQLException, DataAccessException, InvalidMoveException, IOException {
         if(service.verifyAuth(token) == null) {
             var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: invalid authToken");
             connections.sendMsg(session, token, error);
