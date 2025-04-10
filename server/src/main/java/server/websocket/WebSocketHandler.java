@@ -60,7 +60,6 @@ public class WebSocketHandler {
         var notification = new NotificationMessage(
                 ServerMessage.ServerMessageType.NOTIFICATION, user + " has left");
         connections.broadcast(id, token, notification);
-        connections.sendMsg(session, token, notification);
         connections.remove(token);
     }
 
@@ -122,14 +121,12 @@ public class WebSocketHandler {
                     var notification = new NotificationMessage(
                             ServerMessage.ServerMessageType.NOTIFICATION, user + " connected to game as observer");
                     connections.broadcast(id, token, notification);
-                    connections.sendMsg(session, token, notification);
                 }
                 else {
                     var notification = new NotificationMessage(
                             ServerMessage.ServerMessageType.NOTIFICATION,
                             user + " connected to game as " + Objects.requireNonNull(getTeamColor(user, game)));
                     connections.broadcast(id, token, notification);
-                    connections.sendMsg(session, token, notification);
                 }
             }
         } catch (SQLException | DataAccessException | IOException e) {
@@ -177,7 +174,6 @@ public class WebSocketHandler {
                     var message = String.format("%s made move %s to %s", user, move.getStartPosition().toString(), move.getEndPosition().toString());
                     var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
                     connections.broadcast(id, token, notification);
-                    connections.sendMsg(session, token, notification);
 
                     String oppositeName = null;
                     if(getOppositeColor(game, user) == ChessGame.TeamColor.WHITE) {
