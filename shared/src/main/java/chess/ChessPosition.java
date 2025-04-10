@@ -46,4 +46,11 @@ public class ChessPosition {
     public int getColumn() {
         return this.col;
     }
+
+    @Override
+    public String toString() {
+        // Convert row and column to chess notation (e.g., "e4")
+        char file = (char) ('a' + getColumn() - 1); // Convert column to letter (a-h)
+        return file + String.valueOf(getRow());     // Combine with row number
+    }
 }

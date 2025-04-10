@@ -10,10 +10,7 @@ import model.UserData;
 import model.JoinData;
 import serverfacade.ServerFacade;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static ui.EscapeSequences.*;
 
@@ -35,6 +32,7 @@ public class Client {
     private WebSocketFacade ws;
     private GameData storedGame;
     private String storedColor;
+    private boolean highlight = false;
 
     public Client(String serverUrl, NotificationHandler notificationHandler) {
         server = new ServerFacade(serverUrl);
@@ -59,6 +57,8 @@ public class Client {
                 case "redraw" -> redraw();
                 case "leave" -> leave();
                 case "move" -> makeMove(params);
+                case "resign" -> resign();
+                case "highlight" -> highlight(params);
                 default -> help();
             };
         } catch (ResponseException ex) {
@@ -195,7 +195,7 @@ public class Client {
                 ws.connect(auth.authToken(), gameID);
 
                 state = State.GAMEPLAY;
-                String board = createBoard(color.toUpperCase(), game.game());
+                String board = createBoard(color.toUpperCase(), game.game(), null, null);
                 return board + "\n" + String.format("%s joined game %d as %s.", visitorName, num, color) + "\n" + help();
             }
         }
@@ -255,10 +255,10 @@ public class Client {
     public String redraw() {
         if(state == State.GAMEPLAY) {
             if(storedColor == null) {
-                return createBoard("WHITE", storedGame.game());
+                return createBoard("WHITE", storedGame.game(), null, null);
             }
             else {
-                return createBoard(storedColor.toUpperCase(), storedGame.game());
+                return createBoard(storedColor.toUpperCase(), storedGame.game(), null, null);
             }
         }
         else {
@@ -310,13 +310,43 @@ public class Client {
         }
     }
 
+    public String resign() {
+        if(state == State.GAMEPLAY && storedColor != null) {
+            try {
+                ws = new WebSocketFacade(serverUrl, notificationHandler);
+                ws.resign(auth.authToken(), storedGame.gameID());
+
+                return "\n" + help();
+            } catch (ResponseException e) {
+                return "Error: unable to resign";
+            }
+        }
+        else {
+            return "\n" + help();
+        }
+    }
+
+    public String highlight(String... params) {
+        if(state == State.GAMEPLAY) {
+            highlight = true;
+            Collection<ChessMove> highlightedMoves = null;
+            String startPosition = params[0];
+            ChessPosition position = new ChessPosition(getRow(startPosition), getColumn(startPosition));
+            highlightedMoves = storedGame.game().validMoves(position);
+            return createBoard(storedColor, storedGame.game(), position, highlightedMoves);
+        }
+        else {
+            return "\n" + help();
+        }
+    }
+
     public static int getRow(String chessPosition) {
         return Integer.parseInt(chessPosition.substring(1));
     }
 
     public static int getColumn(String chessPosition) {
-        char colChar = chessPosition.charAt(0);
-        return Character.toLowerCase(colChar) - 'a' + 1;
+        char col = chessPosition.charAt(0);
+        return Character.toLowerCase(col) - 'a' + 1;
     }
 
     public static ChessPiece.PieceType getPromotion(String piece) {
@@ -337,14 +367,50 @@ public class Client {
         }
     }
 
-    public void addPieces(String[][] board, int i, StringBuilder boardDisplay) {
+    public void addPieces(String[][] board, int i, StringBuilder boardDisplay, ChessPosition startPosition, Collection<ChessMove> highlightedMoves) {
         for (int j = 0; j < board[i].length; j++) {
             boolean isLightSquare = (i + j) % 2 == 0;
             String squareColor;
-            if (isLightSquare) {
-                squareColor = SET_BG_COLOR_LIGHT_GREY;
-            } else {
-                squareColor = SET_BG_COLOR_DARK_GREY;
+
+            if(highlight) {
+
+                ChessPosition position;
+                if(storedColor == null) {
+                    position = new ChessPosition(8 - i, j + 1);
+                }
+                else if (Objects.equals(storedColor.toUpperCase(), "WHITE")) {
+                    position = new ChessPosition(8 - i, j + 1);
+                } else {
+                    position = new ChessPosition(i + 1, 8 - j);
+                }
+
+                boolean isStartPosition = position.equals(startPosition);
+
+                boolean isLegalMove = false;
+                if (highlightedMoves != null) {
+                    for (ChessMove move : highlightedMoves) {
+                        if (move.getEndPosition().equals(position)) {
+                            isLegalMove = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (isStartPosition) {
+                    squareColor = SET_BG_COLOR_YELLOW;
+                } else if (isLegalMove) {
+                    squareColor = SET_BG_COLOR_GREEN;
+                } else if (isLightSquare) {
+                    squareColor = SET_BG_COLOR_LIGHT_GREY;
+                } else {
+                    squareColor = SET_BG_COLOR_DARK_GREY;
+                }
+            }else {
+                if (isLightSquare) {
+                    squareColor = SET_BG_COLOR_LIGHT_GREY;
+                } else {
+                    squareColor = SET_BG_COLOR_DARK_GREY;
+                }
             }
 
             String pieceColor = getPieceColor(board, i, j);
@@ -357,7 +423,7 @@ public class Client {
         }
     }
 
-    public String displayBoardBlack(ChessBoard chessBoard) {
+    public String displayBoardBlack(ChessBoard chessBoard, ChessPosition position, Collection<ChessMove> highlightedMoves) {
         StringBuilder boardDisplay = new StringBuilder();
         String[][] transformedBoard = transformBoard(chessBoard);
         String[][] board = new String[8][8];
@@ -373,25 +439,38 @@ public class Client {
 
         for (int i = 0; i < board.length; i++) {
             boardDisplay.append(1 + i).append(" ");
-            addPieces(board, i, boardDisplay);
+            addPieces(board, i, boardDisplay, position, highlightedMoves);
             boardDisplay.append(" ").append(1 + i).append("\n");
         }
         boardDisplay.append("   h   g   f   e   d   c   b   a\n");
+        highlight = false;
         return boardDisplay.toString();
     }
 
-    private String createBoard(String color, ChessGame game) {
-        if (Objects.equals(color, "WHITE")) {
-            return displayBoardWhite(game.getBoard());
+    private String createBoard(String color, ChessGame game, ChessPosition position, Collection<ChessMove> highlightedMoves) {
+        if(highlight) {
+            if (Objects.equals(color, "WHITE")) {
+                return displayBoardWhite(game.getBoard(), position, highlightedMoves);
+            }
+            if (Objects.equals(color, "BLACK")) {
+                return displayBoardBlack(game.getBoard(), position, highlightedMoves);
+            } else {
+                return displayBoardWhite(game.getBoard(), position, highlightedMoves);
+            }
         }
-        if (Objects.equals(color, "BLACK")) {
-            return displayBoardBlack(game.getBoard());
-        } else {
-            return "Invalid Color";
+        else {
+            if (Objects.equals(color, "WHITE")) {
+                return displayBoardWhite(game.getBoard(), null, null);
+            }
+            if (Objects.equals(color, "BLACK")) {
+                return displayBoardBlack(game.getBoard(), null, null);
+            } else {
+                return "Invalid Color";
+            }
         }
     }
 
-    public String displayBoardWhite(ChessBoard chessBoard) {
+    public String displayBoardWhite(ChessBoard chessBoard, ChessPosition position, Collection<ChessMove> highlightedMoves) {
         StringBuilder boardDisplay = new StringBuilder();
         String[][] transformedBoard = transformBoard(chessBoard);
         String[][] board = new String[8][8];
@@ -407,10 +486,11 @@ public class Client {
 
         for (int i = 0; i < board.length; i++) {
             boardDisplay.append(8 - i).append(" ");
-            addPieces(board, i, boardDisplay);
+            addPieces(board, i, boardDisplay, position, highlightedMoves);
             boardDisplay.append(" ").append(8 - i).append("\n");
         }
         boardDisplay.append("   a   b   c   d   e   f   g   h\n");
+        highlight = false;
         return boardDisplay.toString();
     }
 
@@ -434,41 +514,6 @@ public class Client {
             pieceColor = "";
         }
         return pieceColor;
-    }
-
-    public String help() {
-        if (state == State.SIGNEDOUT) {
-            return """
-                    - register <USERNAME> <PASSWORD> <EMAIL> - to create an account
-                    - login <USERNAME> <PASSWORD> - to play chess
-                    - quit - playing chess
-                    - help - with possible commands
-                    """;
-        }
-        if (state == State.GAMEPLAY) {
-            return """
-                    - redraw - board
-                    - leave
-                    - move <start square|end square> [promotion piece] - makes a move
-                    - resign
-                    - highlight - legal moves
-                    """;
-        }
-        return """
-                - create <name> - a game
-                - list - games
-                - join <ID> [WHITE|BLACK] - a game
-                - observe <ID> - a game
-                - logout - when you are done
-                - quit
-                - help - with possible commands
-                """;
-    }
-
-    private void assertSignedIn() throws ResponseException {
-        if (state == State.SIGNEDOUT) {
-            throw new ResponseException(400, "You must sign in");
-        }
     }
 
     private String[][] transformBoard(ChessBoard board) {
@@ -532,5 +577,40 @@ public class Client {
 
     public void setStoredGame(GameData game) {
         storedGame = game;
+    }
+
+    public String help() {
+        if (state == State.SIGNEDOUT) {
+            return """
+                    - register <USERNAME> <PASSWORD> <EMAIL> - to create an account
+                    - login <USERNAME> <PASSWORD> - to play chess
+                    - quit - playing chess
+                    - help - with possible commands
+                    """;
+        }
+        if (state == State.GAMEPLAY) {
+            return """
+                    - redraw - board
+                    - leave
+                    - move <start square|end square> [promotion piece] - makes a move
+                    - resign
+                    - highlight - legal moves
+                    """;
+        }
+        return """
+                - create <name> - a game
+                - list - games
+                - join <ID> [WHITE|BLACK] - a game
+                - observe <ID> - a game
+                - logout - when you are done
+                - quit
+                - help - with possible commands
+                """;
+    }
+
+    private void assertSignedIn() throws ResponseException {
+        if (state == State.SIGNEDOUT) {
+            throw new ResponseException(400, "You must sign in");
+        }
     }
 }

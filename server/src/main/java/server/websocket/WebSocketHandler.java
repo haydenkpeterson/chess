@@ -48,7 +48,7 @@ public class WebSocketHandler {
 
     private void leave(String token, Integer id, Session session) throws IOException, SQLException, DataAccessException {
         if(service.verifyAuth(token) == null) {
-            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
+            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: invalid authToken");
             connections.sendMsg(session, token, error);
             return;
         }
@@ -60,12 +60,13 @@ public class WebSocketHandler {
         var notification = new NotificationMessage(
                 ServerMessage.ServerMessageType.NOTIFICATION, user + " has left");
         connections.broadcast(id, token, notification);
+        connections.sendMsg(session, token, notification);
         connections.remove(token);
     }
 
     private void resign(String token, Integer id, Session session) throws SQLException, DataAccessException, IOException {
         if(service.verifyAuth(token) == null) {
-            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
+            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: invalid auth");
             connections.sendMsg(session, token, error);
             return;
         }
@@ -73,7 +74,7 @@ public class WebSocketHandler {
         try {
             GameData game = service.getGameFromID(id);
             if(game == null) {
-                var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
+                var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: invalid game");
                 connections.sendMsg(session, token, error);
             }
             else {
@@ -91,7 +92,7 @@ public class WebSocketHandler {
                     }
                 }
                 else {
-                    var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
+                    var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: game is over");
                     connections.sendMsg(session, token, error);
                 }
             }
@@ -121,12 +122,14 @@ public class WebSocketHandler {
                     var notification = new NotificationMessage(
                             ServerMessage.ServerMessageType.NOTIFICATION, user + " connected to game as observer");
                     connections.broadcast(id, token, notification);
+                    connections.sendMsg(session, token, notification);
                 }
                 else {
                     var notification = new NotificationMessage(
                             ServerMessage.ServerMessageType.NOTIFICATION,
                             user + " connected to game as " + Objects.requireNonNull(getTeamColor(user, game)));
                     connections.broadcast(id, token, notification);
+                    connections.sendMsg(session, token, notification);
                 }
             }
         } catch (SQLException | DataAccessException | IOException e) {
@@ -148,7 +151,7 @@ public class WebSocketHandler {
 
     private void makeMove(String token, int id, ChessMove move, Session session) throws SQLException, DataAccessException, InvalidMoveException, IOException {
         if(service.verifyAuth(token) == null) {
-            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
+            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: invalid authToken");
             connections.sendMsg(session, token, error);
             return;
         }
@@ -156,7 +159,7 @@ public class WebSocketHandler {
         try {
             GameData game = service.getGameFromID(id);
             if(game == null) {
-                var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
+                var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: invalid game");
                 connections.sendMsg(session, token, error);
             }
             else {
@@ -164,7 +167,7 @@ public class WebSocketHandler {
                     try {
                         service.makeMove(token, id, move, getTeamColor(user, game));
                     } catch (InvalidMoveException e) {
-                        var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
+                        var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: invalid move");
                         connections.sendMsg(session, token, error);
                         return;
                     }
@@ -174,15 +177,56 @@ public class WebSocketHandler {
                     var message = String.format("%s made move %s to %s", user, move.getStartPosition().toString(), move.getEndPosition().toString());
                     var notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
                     connections.broadcast(id, token, notification);
+                    connections.sendMsg(session, token, notification);
+
+                    String oppositeName = null;
+                    if(getOppositeColor(game, user) == ChessGame.TeamColor.WHITE) {
+                        oppositeName = game.whiteUsername();
+                    }
+                    if(getOppositeColor(game, user) == ChessGame.TeamColor.BLACK) {
+                        oppositeName = game.blackUsername();
+                    }
+                    if(isInCheckmate(game, user)){
+                        message = String.format("%s is in checkmate", oppositeName);
+                        notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+                        connections.broadcast(id, token, notification);
+                        connections.sendMsg(session, token, notification);
+                    } else if (isInCheck(game, user)) {
+                        message = String.format("%s is now in check", oppositeName);
+                        notification = new NotificationMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
+                        connections.broadcast(id, token, notification);
+                        connections.sendMsg(session, token, notification);
+                    }
                 }
                 else{
-                    var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
+                    var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: game over");
                     connections.sendMsg(session, token, error);
                 }
             }
         } catch (SQLException | DataAccessException | IOException e) {
-            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error");
+            var error = new ErrorMessage(ServerMessage.ServerMessageType.ERROR, "Error: retry");
             connections.sendMsg(session, token, error);
         }
+    }
+
+    public Boolean isInCheck(GameData gameData, String user) {
+        ChessGame.TeamColor otherColor = getOppositeColor(gameData, user);
+        return gameData.game().isInCheck(otherColor);
+    }
+
+    public Boolean isInCheckmate(GameData gameData, String user) {
+        ChessGame.TeamColor otherColor = getOppositeColor(gameData, user);
+        return gameData.game().isInCheckmate(otherColor);
+    }
+
+    private ChessGame.TeamColor getOppositeColor(GameData gameData, String user) {
+        ChessGame.TeamColor otherColor;
+        if(getTeamColor(user, gameData) == ChessGame.TeamColor.WHITE) {
+            otherColor = ChessGame.TeamColor.BLACK;
+        }
+        else {
+            otherColor = ChessGame.TeamColor.WHITE;
+        }
+        return otherColor;
     }
 }

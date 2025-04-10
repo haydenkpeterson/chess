@@ -18,6 +18,7 @@ public class ConnectionManager {
 
     public void add(String token, Session session, int gameID) {
         var connection = new Connection(token, session, gameID);
+        connections.put(token, connection);
         gameConnections.computeIfAbsent(gameID, k -> new ConcurrentHashMap<>())
                 .put(token, connection);
     }
@@ -30,7 +31,7 @@ public class ConnectionManager {
         }
     }
 
-    public void broadcast(int gameID, String excludeVisitorName, ServerMessage message) throws IOException {
+    public void broadcast(int gameID, String excludeAuth, ServerMessage message) throws IOException {
         ConcurrentHashMap<String, Connection> gameMap = gameConnections.get(gameID);
         if (gameMap == null) {
             return;
@@ -49,7 +50,7 @@ public class ConnectionManager {
         if(message instanceof NotificationMessage notificationMessage) {
             for (var c : gameMap.values()) {
                 if (c.session.isOpen()) {
-                    if (!c.token.equals(excludeVisitorName)) {
+                    if (!c.token.equals(excludeAuth)) {
                         String msg = new Gson().toJson(notificationMessage);
                         c.send(msg);
                     }
